@@ -130,6 +130,31 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+      <div className="flex justify-center items-center mb-10">
+        <div className="ct-subheadline-deco-line"></div>
+        <div className="ct-subheadline-label">Mua Offline tại địa chỉ</div>
+        <div className="ct-subheadline-deco-line"></div>
+      </div>
+      <div>
+        <div className="flex justify-center items-center mb-20">
+          <div className="ct-subheadline-deco-line"></div>
+          <div className="mx-4 tracking-widest text-gray-500 font-medium text-sm text-center">
+            75A đường 16A thôn 7 xã Hoà Thuận tỉnh Đăk Lăk thành phố Buôn Ma
+            Thuột
+          </div>
+          <div className="ct-subheadline-deco-line"></div>
+        </div>
+        <iframe
+          title="75A đường 16A thôn 7 xã Hoà Thuận tỉnh Đăk Lăk thành phố Buôn Ma
+            Thuột"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3891.62482444272!2d108.11474547478434!3d12.73788078755643!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3171f9f39b04f8bd%3A0x478027c2d1bc2b4c!2zxJDhuq11LCBu4bq_cCwgxJHGsOG7nW5nLCBiw6FuaCB0csOhbmcgY8O0IFTDuW5n!5e0!3m2!1svi!2s!4v1718710067792!5m2!1svi!2s"
+          width="600"
+          height="450"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          className="w-full h-[500px]"
+        ></iframe>
+      </div>
     </div>
   );
 }
