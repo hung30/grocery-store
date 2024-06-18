@@ -23,9 +23,12 @@ export default function Header() {
   console.log(isToggleMenu);
   console.log(isToggleUser);
   return (
-    <header ref={ref} className="py-4 text-yellow-100   bg-blue-400">
+    <header
+      ref={ref}
+      className="py-4 text-yellow-100   bg-blue-400 fixed w-full z-[100]"
+    >
       <nav className="flex flex-row justify-between items-center">
-        <div className="logo basis-2/6 text-center text-xl font-semibold cursor-pointer">
+        <div className="logo basis-2/6 text-center text-xl font-semibold cursor-pointer pl-2">
           <a href="/">TùngStore.</a>
         </div>
         <ul
