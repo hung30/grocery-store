@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 export default function Header() {
-  const [isUser, setIsUser] = useState(true);
+  const [isUser, setIsUser] = useState(false);
   const [isToggleMenu, setIsToggleMenu] = useState(false);
   const [isToggleUser, setIsToggleUser] = useState(false);
   const ref = useRef(null);
@@ -20,8 +20,6 @@ export default function Header() {
       document.removeEventListener("mousedown", handler);
     };
   }, [isToggleMenu, isToggleUser]);
-  console.log(isToggleMenu);
-  console.log(isToggleUser);
   return (
     <header
       ref={ref}
@@ -216,7 +214,7 @@ export default function Header() {
               <li className="border-b border-gray-300 py-1">
                 <a href="/login">Đăng nhập</a>
               </li>
-              <li className="py-1">
+              <li className="pt-1">
                 <a href="/register">Đăng ký</a>
               </li>
             </ul>
