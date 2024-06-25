@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-
+import { useLocation } from "react-router-dom";
 export default function Header() {
   const [isUser, setIsUser] = useState(false);
   const [isToggleMenu, setIsToggleMenu] = useState(false);
   const [isToggleUser, setIsToggleUser] = useState(false);
   const ref = useRef(null);
+  const location = useLocation();
   useEffect(() => {
     const handler = (event) => {
       if (isToggleMenu && ref.current && !ref.current.contains(event.target)) {
@@ -20,10 +21,13 @@ export default function Header() {
       document.removeEventListener("mousedown", handler);
     };
   }, [isToggleMenu, isToggleUser]);
+  const getNavLinkClass = (path) => {
+    return location.pathname === path ? "ct-top-menu-item-active" : "";
+  };
   return (
     <header
       ref={ref}
-      className="py-4 text-yellow-100   bg-blue-400 fixed w-full z-[100]"
+      className="py-4 text-yellow-100 bg-blue-400 fixed w-full z-[100]"
     >
       <nav className="flex flex-row justify-between items-center">
         <div className="logo basis-2/6 text-center text-xl font-semibold cursor-pointer pl-2">
@@ -33,16 +37,16 @@ export default function Header() {
           id="ct-top-menu"
           className="basis-3/6 hidden lg:flex lg:items-center lg:justify-end lg:gap-8 uppercase"
         >
-          <li className="ct-top-menu-item">
+          <li className={`ct-top-menu-item ${getNavLinkClass("/")}`}>
             <a href="/">Trang chủ</a>
           </li>
-          <li className="ct-top-menu-item">
+          <li className={`ct-top-menu-item ${getNavLinkClass("/product")}`}>
             <a href="/product">Sản phẩm</a>
           </li>
-          <li className="ct-top-menu-item">
+          <li className={`ct-top-menu-item ${getNavLinkClass("/news")}`}>
             <a href="/news">Tin tức</a>
           </li>
-          <li className="ct-top-menu-item">
+          <li className={`ct-top-menu-item ${getNavLinkClass("/contact")}`}>
             <a href="/contact">Liên hệ</a>
           </li>
         </ul>
@@ -115,10 +119,10 @@ export default function Header() {
               {isToggleUser && (
                 <ul className="absolute z-50 top-6 right-0 bg-white text-black text-sm p-2 whitespace-nowrap rounded-sm animate-sliceDown">
                   <li className="border-b border-gray-300 pb-1">
-                    <a href="/">Trang chủ</a>
+                    <a href="/">Cá nhân</a>
                   </li>
                   <li className="border-b border-gray-300 py-1">
-                    <a href="/user">Cá nhân</a>
+                    <a href="/user">Đơn đặt</a>
                   </li>
                   <li className="border-b border-gray-300 py-1">
                     <a href="/setting">Cài đặt</a>
@@ -174,6 +178,9 @@ export default function Header() {
               </li>
               <li className="border-b border-gray-300 py-1">
                 <a href="/user">userName</a>
+              </li>
+              <li className="border-b border-gray-300 py-1">
+                <a href="/order">Đơn đặt</a>
               </li>
               <li className="border-b border-gray-300 py-1">
                 <a href="/setting">Cài đặt</a>

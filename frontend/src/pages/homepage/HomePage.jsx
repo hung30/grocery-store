@@ -151,7 +151,7 @@ export default function HomePage() {
           width="600"
           height="450"
           loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"
+          referrerPolicy="no-referrer-when-downgrade"
           className="w-full h-[500px]"
         ></iframe>
       </div>

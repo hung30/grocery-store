@@ -10,9 +10,9 @@ import RegisterPage from "./pages/authpage/RegisterPage";
 function App() {
   return (
     <div className="grid grid-rows-[auto_1fr_auto] min-h-screen max-w-screen-2xl mx-auto text-base">
-      <Header />
       <div className="h-[70px]"></div>
       <BrowserRouter>
+        <Header />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/product" element={<Product />} />
