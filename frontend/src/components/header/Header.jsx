@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 export default function Header() {
-  const [isUser, setIsUser] = useState(false);
+  const [isUser, setIsUser] = useState(true);
   const [isToggleMenu, setIsToggleMenu] = useState(false);
   const [isToggleUser, setIsToggleUser] = useState(false);
   const ref = useRef(null);

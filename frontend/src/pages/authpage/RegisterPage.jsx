@@ -1,17 +1,34 @@
 import React, { useState } from "react";
 import Input from "../../components/textfield/Input";
+import axios from "axios";
 
 export default function RegisterPage() {
   const [userEmail, setUserEmail] = useState("");
   const [telephone, setTelephone] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const registerHandle = () => {
-    console.log(userEmail);
-    console.log(telephone);
-    console.log(password);
-    console.log(confirmPassword);
-    console.log("xử lý đky tại đây");
+  const registerHandle = async () => {
+    // console.log(userEmail);
+    // console.log(telephone);
+    // console.log(name);
+    // console.log(password);
+    // console.log(confirmPassword);
+    // console.log("xử lý đky tại đây");
+    try {
+      const data = {
+        email: userEmail,
+        telephone: telephone,
+        name: name,
+        password: password,
+      };
+      if (password === confirmPassword) {
+        const res = await axios.post("http://localhost:5000/v1/users", data);
+        console.log(res);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
   return (
     <div className="flex flex-col justify-start items-center">
@@ -23,12 +40,13 @@ export default function RegisterPage() {
           Tạo tài khoản mới của bạn
         </div>
         <div className="flex flex-col mb-14 gap-4">
-          <Input type="text" placeholder="Email" setData={userEmail} />
+          <Input type="text" placeholder="Email" setData={setUserEmail} />
           <Input
             type="text"
             placeholder="Số điện thoại"
             setData={setTelephone}
           />
+          <Input type="text" placeholder="Tên" setData={setName} />
           <Input type="password" placeholder="Mật khẩu" setData={setPassword} />
           <Input
             type="password"
