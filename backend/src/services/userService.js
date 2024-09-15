@@ -1,5 +1,9 @@
 import { Bcrypt } from "~/utils/bcrypt";
 import { userModel } from "~/models/userModel";
+import { JwtProvider } from "~/providers/JwtProvider";
+import { env } from "~/config/environment";
+// import { StatusCodes } from "http-status-codes";
+// import ApiError from "~/utils/ApiError";
 const createNew = async (reqBody) => {
   try {
     const newUser = {
@@ -45,9 +49,43 @@ const deleteUserById = async (id) => {
   }
 };
 
+const login = async (reqBody) => {
+  try {
+    const user = await userModel.findOneByEmail(reqBody.email);
+    if (!user) {
+      return false;
+    }
+    const comparePassword = await Bcrypt.compareData(
+      reqBody.password,
+      user.password
+    );
+    if (!comparePassword) {
+      return false;
+    }
+    const { password, ...userInfo } = user;
+
+    const accessToken = await JwtProvider.generateToken(
+      userInfo,
+      env.ACCESS_TOKEN_PRIVATE_KEY,
+      // "1m"
+      5
+    );
+
+    const refreshToken = await JwtProvider.generateToken(
+      userInfo,
+      env.REFRESH_TOKEN_PRIVATE_KEY,
+      "14 days"
+    );
+    return { userInfo, accessToken, refreshToken };
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const userService = {
   createNew,
   getOneUserById,
   updateUserById,
   deleteUserById,
+  login,
 };

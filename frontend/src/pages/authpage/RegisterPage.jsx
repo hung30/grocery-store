@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Input from "../../components/textfield/Input";
-import axios from "axios";
+import authorizedAxiosInstance from "./../../utils/authorizedAxios";
+import { env } from "../../config/environment";
 
 export default function RegisterPage() {
   const [userEmail, setUserEmail] = useState("");
@@ -23,7 +24,10 @@ export default function RegisterPage() {
         password: password,
       };
       if (password === confirmPassword) {
-        const res = await axios.post("http://localhost:5000/v1/users", data);
+        const res = await authorizedAxiosInstance.post(
+          `${env.API_URL}/v1/users`,
+          data
+        );
         console.log(res);
       }
     } catch (error) {
