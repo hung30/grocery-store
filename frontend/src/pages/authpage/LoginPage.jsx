@@ -1,13 +1,34 @@
 import { useState } from "react";
 import Input from "../../components/textfield/Input";
+import authorizedAxiosInstance from "./../../utils/authorizedAxios";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "../../redux/authSlice";
+import { env } from "../../config/environment";
 
 export default function LoginPage() {
   const [userEmail, setUserEmail] = useState("");
   const [password, setPassword] = useState("");
-  const loginHandle = () => {
-    console.log(userEmail);
-    console.log(password);
-    console.log("xử lý login tại đây");
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const loginHandle = async () => {
+    try {
+      const data = {
+        email: userEmail,
+        password: password,
+      };
+
+      const res = await authorizedAxiosInstance.post(
+        `${env.API_URL}/v1/users/login`,
+        data
+      );
+      localStorage.setItem("userInfo", JSON.stringify(res.data.userInfo));
+      dispatch(loginSuccess(res.data.userInfo));
+      navigate("/product");
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <div className="flex flex-col justify-start items-center">

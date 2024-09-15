@@ -7,7 +7,7 @@ export default function Product() {
   const [totalPage, setTotalPage] = useState(Math.ceil(Products.length / 6));
   const [currentPage, setCurrentPage] = useState(0); // Trang hiện tại bắt đầu từ 0
   const [displayedProducts, setDisplayedProducts] = useState([]);
-  const [type, setType] = useState("");
+  const [type, setType] = useState();
   const productsPerPage = 6; // Số lượng sản phẩm trên mỗi trang
 
   useEffect(() => {
@@ -29,6 +29,7 @@ export default function Product() {
     setType(newType);
     setCurrentPage(0);
   };
+  console.log(type);
   return (
     <div className="flex flex-col items-center w-full gap-4 mx-auto xl:px-24">
       <div className="text-3xl font-medium p-4 uppercase">Sản phẩm</div>
@@ -38,7 +39,9 @@ export default function Product() {
           <ul className="flex flex-wrap gap-2 justify-center items-center md:block">
             <li>
               <button
-                className="border-[1px] border-gray-300 rounded-xl px-4 mb-2 hover:border-gray-500"
+                className={`border-[1px] border-gray-300 rounded-xl px-4 mb-2 hover:border-gray-500 ${
+                  !type ? "border-black" : ""
+                }`}
                 onClick={handleTypeProductChange()}
               >
                 Tất cả sản phẩm
@@ -48,7 +51,9 @@ export default function Product() {
               (item, index) => (
                 <li key={index}>
                   <button
-                    className="border-[1px] border-gray-300 rounded-xl px-4 mb-2 hover:border-gray-500"
+                    className={`border-[1px] border-gray-300 rounded-xl px-4 mb-2 hover:border-gray-500 ${
+                      type === item ? "border-black" : ""
+                    }`}
                     onClick={handleTypeProductChange(item)}
                   >
                     {item}
@@ -84,6 +89,14 @@ export default function Product() {
                   />
                 </svg>
               </button>
+            </div>
+          </div>
+
+          <div className="">
+            <div className="xl:px-[305px] xl:text-left text-center text-2xl">
+              {type
+                ? type.charAt(0).toUpperCase() + type.slice(1)
+                : "Tất cả sản phẩm"}
             </div>
           </div>
           <div className="flex flex-wrap gap-4 justify-center xl:justify-normal">

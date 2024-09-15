@@ -58,6 +58,16 @@ const findOneById = async (id) => {
   }
 };
 
+const findOneByEmail = async (email) => {
+  try {
+    return await GET_DB()
+      .collection(USER_COLLECTION_NAME)
+      .findOne({ email: email });
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 const deleteUserById = async (id) => {
   try {
     return await GET_DB()
@@ -75,4 +85,5 @@ export const userModel = {
   findOneById,
   updateUserById,
   deleteUserById,
+  findOneByEmail,
 };

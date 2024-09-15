@@ -1,11 +1,22 @@
 import { useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../redux/authSlice";
+import authorizedAxiosInstance from "../../utils/authorizedAxios";
+import { env } from "../../config/environment";
+import { message } from "antd";
+import { handleLogoutAPI } from "../../apis/authApis";
+
 export default function Header() {
-  const [isUser, setIsUser] = useState(true);
+  // const [user, setUser] = useState(false);
   const [isToggleMenu, setIsToggleMenu] = useState(false);
   const [isToggleUser, setIsToggleUser] = useState(false);
   const ref = useRef(null);
   const location = useLocation();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);
+  const navigate = useNavigate();
+
   useEffect(() => {
     const handler = (event) => {
       if (isToggleMenu && ref.current && !ref.current.contains(event.target)) {
@@ -21,9 +32,22 @@ export default function Header() {
       document.removeEventListener("mousedown", handler);
     };
   }, [isToggleMenu, isToggleUser]);
+
   const getNavLinkClass = (path) => {
     return location.pathname === path ? "ct-top-menu-item-active" : "";
   };
+
+  const handleLogout = async () => {
+    try {
+      await handleLogoutAPI();
+      dispatch(logout());
+      message.success("Đăng xuất thành công!");
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <header
       ref={ref}
@@ -50,16 +74,20 @@ export default function Header() {
             <a href="/contact">Liên hệ</a>
           </li>
         </ul>
-        {!isUser ? (
+        {!user ? (
           <div className="hidden lg:block lg:basis-1/6 lg:text-end lg:ml-16 mr-2">
-            <a href="/login" className="bg-blue-500 p-2 rounded">
+            <a
+              href="/login"
+              title="Đăng nhập"
+              className="bg-blue-500 p-2 rounded"
+            >
               Đăng nhập
             </a>
           </div>
         ) : (
           <ul className="basis-4/6 lg:basis-1/6 flex items-center justify-end lg:justify-end ml-16 gap-2">
             <li>
-              <a href="/cart" className="flex items-center">
+              <a href="/cart" title="cart" className="flex items-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -80,10 +108,11 @@ export default function Header() {
               </a>
             </li>
             <li
+              title="user"
               className="hidden lg:block cursor-pointer relative"
               onClick={() => setIsToggleUser(!isToggleUser)}
             >
-              <span>user</span>{" "}
+              <span>{user.name}</span>{" "}
               {!isToggleUser && (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -128,7 +157,7 @@ export default function Header() {
                     <a href="/setting">Cài đặt</a>
                   </li>
                   <li className="py-1">
-                    <a href="/logout">Đăng xuất</a>
+                    <button onClick={handleLogout}>Đăng xuất</button>
                   </li>
                 </ul>
               )}
@@ -137,7 +166,7 @@ export default function Header() {
         )}
         <div
           id="ct-toggle-top-menu-icon"
-          className="lg:hidden flex items-center px-2 sm:px-4 relative"
+          className="lg:hidden flex items-center px-2 sm:px-4 relative mr-3"
           onClick={() => setIsToggleMenu(!isToggleMenu)}
         >
           {!isToggleMenu ? (
@@ -171,13 +200,13 @@ export default function Header() {
               />
             </svg>
           )}
-          {isToggleMenu && isUser && (
+          {isToggleMenu && user && (
             <ul className="absolute z-50 top-7 right-0 bg-white text-black text-sm p-2 whitespace-nowrap rounded-sm animate-sliceDown">
               <li className="border-b border-gray-300 py-1">
                 <a href="/">Trang chủ</a>
               </li>
               <li className="border-b border-gray-300 py-1">
-                <a href="/user">userName</a>
+                <a href="/user">{user.name}</a>
               </li>
               <li className="border-b border-gray-300 py-1">
                 <a href="/order">Đơn đặt</a>
@@ -195,13 +224,11 @@ export default function Header() {
                 <a href="/contact">Liên hệ</a>
               </li>
               <li className="py-1">
-                <a href="/logout" onClick={() => setIsUser(false)}>
-                  Đăng xuất{" "}
-                </a>
+                <button onClick={handleLogout}>Đăng xuất</button>
               </li>
             </ul>
           )}
-          {isToggleMenu && !isUser && (
+          {isToggleMenu && !user && (
             <ul className="absolute z-50 top-7 right-0 bg-white text-black text-sm p-2 whitespace-nowrap rounded-sm animate-sliceDown">
               <li className="border-b border-gray-300 py-1">
                 <a href="/">Trang chủ</a>
