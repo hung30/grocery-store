@@ -2,13 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/authSlice";
-import authorizedAxiosInstance from "../../utils/authorizedAxios";
-import { env } from "../../config/environment";
 import { message } from "antd";
 import { handleLogoutAPI } from "../../apis/authApis";
 
 export default function Header() {
-  // const [user, setUser] = useState(false);
+  // const [userInfo, setUserInfo] = useState(false);
   const [isToggleMenu, setIsToggleMenu] = useState(false);
   const [isToggleUser, setIsToggleUser] = useState(false);
   const ref = useRef(null);
@@ -47,7 +45,6 @@ export default function Header() {
       console.log(error);
     }
   };
-
   return (
     <header
       ref={ref}
@@ -112,7 +109,11 @@ export default function Header() {
               className="hidden lg:block cursor-pointer relative"
               onClick={() => setIsToggleUser(!isToggleUser)}
             >
-              <span>{user.name}</span>{" "}
+              <span>
+                {user.name.length <= 6
+                  ? user.name
+                  : user.name.slice(5) + " ..."}
+              </span>{" "}
               {!isToggleUser && (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -206,7 +207,11 @@ export default function Header() {
                 <a href="/">Trang chủ</a>
               </li>
               <li className="border-b border-gray-300 py-1">
-                <a href="/user">{user.name}</a>
+                <a href="/user">
+                  {user.name.length <= 6
+                    ? user.name
+                    : user.name.slice(5) + " ..."}
+                </a>
               </li>
               <li className="border-b border-gray-300 py-1">
                 <a href="/order">Đơn đặt</a>
