@@ -66,7 +66,7 @@ export default function LoginPage() {
         <div className="text-gray-500">
           <div className="text-center text-xl  mb-2">Đăng nhập với: </div>
           <a
-            href="/"
+            href={`${env.API_URL}/v1/auth-google/google`}
             className="flex flex-row justify-center items-center gap-2"
           >
             <img
