@@ -110,7 +110,7 @@ export default function Header() {
               onClick={() => setIsToggleUser(!isToggleUser)}
             >
               <span>
-                {user.name.length <= 6
+                {user?.name.length <= 6
                   ? user.name
                   : user.name.slice(5) + " ..."}
               </span>{" "}
@@ -208,7 +208,7 @@ export default function Header() {
               </li>
               <li className="border-b border-gray-300 py-1">
                 <a href="/user">
-                  {user.name.length <= 6
+                  {user?.name.length <= 6
                     ? user.name
                     : user.name.slice(5) + " ..."}
                 </a>

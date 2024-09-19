@@ -6,9 +6,9 @@ import { ObjectId } from "mongodb";
 const USER_COLLECTION_NAME = "users";
 const USER_SCHEMA = Joi.object({
   email: Joi.string().email().required().trim().strict(),
-  telephone: Joi.string().required().min(10).max(10).trim().strict(),
+  telephone: Joi.string().trim().strict().allow(""),
   name: Joi.string().required().min(1).max(30).trim().strict(),
-  password: Joi.string().trim().strict(),
+  password: Joi.string().trim().strict().allow(""),
   address: Joi.string().trim().strict().default(""),
   isAdmin: Joi.boolean().default(false),
   createdAt: Joi.date().timestamp("javascript").default(Date.now),

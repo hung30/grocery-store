@@ -42,8 +42,8 @@ function App() {
           <Route path="/product" element={<Product />} />
           <Route path="/news" element={<NewsPage />} />
 
+          <Route path="/login" element={<LoginPage />} />
           <Route element={<UnauthorizedRoutes />}>
-            <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
           </Route>
 

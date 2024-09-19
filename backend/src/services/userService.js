@@ -67,8 +67,7 @@ const login = async (reqBody) => {
     const accessToken = await JwtProvider.generateToken(
       userInfo,
       env.ACCESS_TOKEN_PRIVATE_KEY,
-      // "1m"
-      5
+      "1m"
     );
 
     const refreshToken = await JwtProvider.generateToken(

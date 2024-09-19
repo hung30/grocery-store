@@ -7,12 +7,28 @@ import { errorHandlingMiddleware } from "~/middlewares/errorHandlingMiddleware";
 import cors from "cors";
 import { corsOptions } from "~/config/corsOptions";
 import cookieParser from "cookie-parser";
+import session from "express-session";
+import passport from "passport";
+import "~/config/passport";
 
 const START_SERVER = () => {
   const app = express();
 
   app.use(cookieParser());
   app.use(cors(corsOptions));
+
+  // Cấu hình session
+  app.use(
+    session({
+      secret: env.CLIENT_SECRET,
+      resave: false,
+      saveUninitialized: true,
+    })
+  );
+
+  // Khởi tạo Passport.js
+  app.use(passport.initialize());
+  app.use(passport.session());
 
   //enable req.body json data
   app.use(express.json());

@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Products } from "./data";
 import ReactPaginate from "react-paginate";
 import "./Product.css";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "../../redux/authSlice";
 
 export default function Product() {
   const [totalPage, setTotalPage] = useState(Math.ceil(Products.length / 6));
@@ -9,6 +12,8 @@ export default function Product() {
   const [displayedProducts, setDisplayedProducts] = useState([]);
   const [type, setType] = useState();
   const productsPerPage = 6; // Số lượng sản phẩm trên mỗi trang
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const filtered = type
@@ -20,6 +25,17 @@ export default function Product() {
     setDisplayedProducts(filtered.slice(start, end));
   }, [currentPage, productsPerPage, type]);
 
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const user = urlParams.get("user");
+    if (user) {
+      const userInfo = JSON.parse(decodeURIComponent(user));
+      localStorage.setItem("userInfo", JSON.stringify(userInfo));
+      dispatch(loginSuccess(userInfo));
+      navigate("/product");
+    }
+  }, [dispatch, navigate]);
+
   // Danh sách sản phẩm để hiển thị trên trang hiện tại
 
   const handlePageChange = ({ selected }) => {
@@ -29,7 +45,6 @@ export default function Product() {
     setType(newType);
     setCurrentPage(0);
   };
-  console.log(type);
   return (
     <div className="flex flex-col items-center w-full gap-4 mx-auto xl:px-24">
       <div className="text-3xl font-medium p-4 uppercase">Sản phẩm</div>
