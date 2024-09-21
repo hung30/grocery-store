@@ -45,6 +45,7 @@ export default function Product() {
     setType(newType);
     setCurrentPage(0);
   };
+  console.log("displayedProducts", type);
   return (
     <div className="flex flex-col items-center w-full gap-4 mx-auto xl:px-24">
       <div className="text-3xl font-medium p-4 uppercase">Sản phẩm</div>
@@ -55,7 +56,7 @@ export default function Product() {
             <li>
               <button
                 className={`border-[1px] border-gray-300 rounded-xl px-4 mb-2 hover:border-gray-500 ${
-                  !type ? "border-black" : ""
+                  !type ? "border-gray-950" : ""
                 }`}
                 onClick={handleTypeProductChange()}
               >
@@ -67,7 +68,7 @@ export default function Product() {
                 <li key={index}>
                   <button
                     className={`border-[1px] border-gray-300 rounded-xl px-4 mb-2 hover:border-gray-500 ${
-                      type === item ? "border-black" : ""
+                      type === item ? "border-gray-950" : ""
                     }`}
                     onClick={handleTypeProductChange(item)}
                   >
