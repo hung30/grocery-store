@@ -68,6 +68,18 @@ const findOneByEmail = async (email) => {
   }
 };
 
+const findOneByEmailOrPhone = async (email, telephone) => {
+  try {
+    return await GET_DB()
+      .collection(USER_COLLECTION_NAME)
+      .findOne({
+        $or: [{ email: email }, { telephone: telephone }],
+      });
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 const deleteUserById = async (id) => {
   try {
     return await GET_DB()
@@ -86,4 +98,5 @@ export const userModel = {
   updateUserById,
   deleteUserById,
   findOneByEmail,
+  findOneByEmailOrPhone,
 };

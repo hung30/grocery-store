@@ -1,23 +1,26 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Input from "../../components/textfield/Input";
 import authorizedAxiosInstance from "./../../utils/authorizedAxios";
-import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../../redux/authSlice";
 import { env } from "../../config/environment";
+import { LoadingContext } from "../../contexts/LoadingContext";
+import googleLogo from "../../assets/googleLogo.png";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
   const [userEmail, setUserEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+  const { setIsLoading } = useContext(LoadingContext);
   const loginHandle = async () => {
     try {
       const data = {
         email: userEmail,
         password: password,
       };
+      setIsLoading(true);
 
       const res = await authorizedAxiosInstance.post(
         `${env.API_URL}/v1/users/login`,
@@ -25,8 +28,10 @@ export default function LoginPage() {
       );
       localStorage.setItem("userInfo", JSON.stringify(res.data.userInfo));
       dispatch(loginSuccess(res.data.userInfo));
+      setIsLoading(false);
       navigate("/product");
     } catch (error) {
+      setIsLoading(false);
       console.log(error);
     }
   };
@@ -40,8 +45,16 @@ export default function LoginPage() {
           Đăng nhập vào tài khoản của bạn
         </div>
         <div className="flex flex-col mb-4 gap-4">
-          <Input type="email" placeholder="Email" setData={setUserEmail} />
-          <Input type="password" placeholder="Mật khẩu" setData={setPassword} />
+          <Input
+            type="email"
+            placeholder="Email"
+            setData={(e) => setUserEmail(e.target.value)}
+          />
+          <Input
+            type="password"
+            placeholder="Mật khẩu"
+            setData={(e) => setPassword(e.target.value)}
+          />
         </div>
         <div className="text-end text-blue-500 mb-10 mt-[-10px]">
           <a href="/forgot-password">Quên mật khẩu?</a>
@@ -69,12 +82,7 @@ export default function LoginPage() {
             href={`${env.API_URL}/v1/auth-google/google`}
             className="flex flex-row justify-center items-center gap-2"
           >
-            <img
-              src="https://account.cellphones.com.vn/_nuxt/img/image45.93ceca6.png"
-              width={40}
-              height={40}
-              alt="google"
-            />
+            <img src={googleLogo} width={40} height={40} alt="google" />
             <div className="text-lg">Google</div>
           </a>
         </div>

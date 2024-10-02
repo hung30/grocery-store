@@ -21,6 +21,13 @@ const createNew = async (req, res, next) => {
   try {
     // điều hướng dữ liệu sang tầng service
     const createdUser = await userService.createNew(req.body);
+
+    if (!createdUser) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        "Email hoặc số điện thoại đã tồn tại"
+      );
+    }
     // có kết quả thì trả về phía client
     res.status(StatusCodes.CREATED).json({
       message: "Tạo user thành công",
@@ -68,7 +75,7 @@ const login = async (req, res, next) => {
     const result = await userService.login(req.body);
     if (!result) {
       throw new ApiError(
-        StatusCodes.UNAUTHORIZED,
+        StatusCodes.BAD_REQUEST,
         "Tài khoản hoặc mật khẩu không chính xác"
       );
     }

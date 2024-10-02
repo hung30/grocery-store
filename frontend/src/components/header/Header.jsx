@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/authSlice";
 import { message } from "antd";
 import { handleLogoutAPI } from "../../apis/authApis";
+import { useContext } from "react";
+import { LoadingContext } from "../../contexts/LoadingContext";
 
 export default function Header() {
   // const [userInfo, setUserInfo] = useState(false);
@@ -14,6 +16,7 @@ export default function Header() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
   const navigate = useNavigate();
+  const { setIsLoading } = useContext(LoadingContext);
 
   useEffect(() => {
     const handler = (event) => {
@@ -37,14 +40,18 @@ export default function Header() {
 
   const handleLogout = async () => {
     try {
+      setIsLoading(true);
       await handleLogoutAPI();
       dispatch(logout());
       message.success("Đăng xuất thành công!");
+      setIsLoading(false);
       navigate("/");
     } catch (error) {
+      setIsLoading(false);
       console.log(error);
     }
   };
+
   return (
     <header
       ref={ref}
@@ -70,9 +77,34 @@ export default function Header() {
           <li className={`ct-top-menu-item ${getNavLinkClass("/contact")}`}>
             <a href="/contact">Liên hệ</a>
           </li>
+          {user?.isAdmin && (
+            <li className={`ct-top-menu-item ${getNavLinkClass("/contact")}`}>
+              <a href="/admin">Admin</a>
+            </li>
+          )}
         </ul>
-        {!user ? (
-          <div className="hidden lg:block lg:basis-1/6 lg:text-end lg:ml-16 mr-2">
+        {!user &&
+          location.pathname !== "/login" &&
+          location.pathname !== "/register" && (
+            <div className="hidden lg:flex justify-center items-center lg:basis-1/6 text-sm xl:text-base mr-2 gap-2">
+              <a
+                href="/register"
+                title="Đăng ký"
+                className="bg-blue-500 p-2 rounded"
+              >
+                Đăng ký
+              </a>
+              <a
+                href="/login"
+                title="Đăng nhập"
+                className="bg-blue-500 p-2 rounded"
+              >
+                Đăng nhập
+              </a>
+            </div>
+          )}
+        {!user && location.pathname === "/register" && (
+          <div className="hidden lg:block lg:basis-1/6 lg:text-end lg:ml-16 mr-4">
             <a
               href="/login"
               title="Đăng nhập"
@@ -81,7 +113,19 @@ export default function Header() {
               Đăng nhập
             </a>
           </div>
-        ) : (
+        )}
+        {!user && location.pathname === "/login" && (
+          <div className="hidden lg:block lg:basis-1/6 lg:text-end lg:ml-16 mr-4">
+            <a
+              href="/register"
+              title="Đăng ký"
+              className="bg-blue-500 p-2 rounded"
+            >
+              Đăng ký
+            </a>
+          </div>
+        )}
+        {user && (
           <ul className="basis-4/6 lg:basis-1/6 flex items-center justify-end lg:justify-end ml-16 gap-2">
             <li>
               <a href="/cart" title="cart" className="flex items-center">
@@ -105,14 +149,14 @@ export default function Header() {
               </a>
             </li>
             <li
-              title="user"
+              title={user?.name ? user.name : "User"}
               className="hidden lg:block cursor-pointer relative"
               onClick={() => setIsToggleUser(!isToggleUser)}
             >
               <span>
-                {user?.name.length <= 6
+                {user?.name.length <= 7
                   ? user.name
-                  : user.name.slice(5) + " ..."}
+                  : user.name.slice(user.name.lastIndexOf(" ") + 1)}
               </span>{" "}
               {!isToggleUser && (
                 <svg
@@ -154,9 +198,9 @@ export default function Header() {
                   <li className="border-b border-gray-300 py-1">
                     <a href="/user">Đơn đặt</a>
                   </li>
-                  <li className="border-b border-gray-300 py-1">
+                  {/* <li className="border-b border-gray-300 py-1">
                     <a href="/setting">Cài đặt</a>
-                  </li>
+                  </li> */}
                   <li className="py-1">
                     <button onClick={handleLogout}>Đăng xuất</button>
                   </li>
@@ -208,27 +252,32 @@ export default function Header() {
               </li>
               <li className="border-b border-gray-300 py-1">
                 <a href="/user">
-                  {user?.name.length <= 6
+                  {user?.name.length <= 7
                     ? user.name
-                    : user.name.slice(5) + " ..."}
+                    : user.name.slice(user.name.lastIndexOf(" ") + 1)}
                 </a>
               </li>
               <li className="border-b border-gray-300 py-1">
                 <a href="/order">Đơn đặt</a>
               </li>
-              <li className="border-b border-gray-300 py-1">
+              {/* <li className="border-b border-gray-300 py-1">
                 <a href="/setting">Cài đặt</a>
-              </li>
+              </li> */}
               <li className="border-b border-gray-300 py-1">
                 <a href="/product">Sản phẩm</a>
               </li>
               <li className="border-b border-gray-300 py-1">
                 <a href="/news">Tin tức</a>
               </li>
-              <li className="border-b border-gray-300">
+              <li className="border-b border-gray-300 py-1">
                 <a href="/contact">Liên hệ</a>
               </li>
-              <li className="py-1">
+              {user?.isAdmin && (
+                <li className="border-b border-gray-300 py-1">
+                  <a href="/admin">Admin</a>
+                </li>
+              )}
+              <li className="">
                 <button onClick={handleLogout}>Đăng xuất</button>
               </li>
             </ul>
@@ -238,9 +287,9 @@ export default function Header() {
               <li className="border-b border-gray-300 py-1">
                 <a href="/">Trang chủ</a>
               </li>
-              <li className="border-b border-gray-300 py-1">
+              {/* <li className="border-b border-gray-300 py-1">
                 <a href="/setting">Cài đặt</a>
-              </li>
+              </li> */}
               <li className="border-b border-gray-300 py-1">
                 <a href="/product">Sản phẩm</a>
               </li>
