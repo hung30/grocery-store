@@ -4,6 +4,7 @@ import {
   Outlet,
   Route,
   Routes,
+  useLocation,
 } from "react-router-dom";
 import "./App.css";
 import HomePage from "./pages/homepage/HomePage";
@@ -14,6 +15,10 @@ import LoginPage from "./pages/authpage/LoginPage";
 import RegisterPage from "./pages/authpage/RegisterPage";
 import NewsPage from "./pages/authpage/NewsPage";
 import CartPage from "./pages/cartpage/CartPage";
+import AdminLayout from "./layouts/AdminLayout";
+import { LoadingContext, LoadingProvider } from "./contexts/LoadingContext";
+import { useContext } from "react";
+import Spinner from "./components/spinner/Spinner";
 
 const ProtectedRoutes = () => {
   const user = JSON.parse(localStorage.getItem("userInfo"));
@@ -31,29 +36,53 @@ const UnauthorizedRoutes = () => {
   return <Outlet />;
 };
 
-function App() {
+const LoadingSpin = () => {
+  const { isLoading } = useContext(LoadingContext);
+  return isLoading && <Spinner />;
+};
+
+function Layout() {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith("/admin");
+
   return (
     <div className="grid grid-rows-[auto_1fr_auto] min-h-screen max-w-screen-2xl mx-auto text-base">
-      <div className="h-[70px]"></div>
+      {!isAdminRoute && <div className="h-[70px]"></div>}
+      {!isAdminRoute && <Header />}
+      <LoadingSpin />
+      <Outlet />
+      {!isAdminRoute && <Footer />}
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <LoadingProvider>
       <BrowserRouter>
-        <Header />
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/product" element={<Product />} />
-          <Route path="/news" element={<NewsPage />} />
+          <Route element={<Layout />}>
+            <Route index element={<HomePage />} />
+            <Route path="/product" element={<Product />} />
+            <Route path="/news" element={<NewsPage />} />
 
-          <Route path="/login" element={<LoginPage />} />
-          <Route element={<UnauthorizedRoutes />}>
-            <Route path="/register" element={<RegisterPage />} />
-          </Route>
+            <Route element={<UnauthorizedRoutes />}>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+            </Route>
 
-          <Route element={<ProtectedRoutes />}>
-            <Route path="/cart" element={<CartPage />} />
+            <Route element={<ProtectedRoutes />}>
+              <Route path="/cart" element={<CartPage />} />
+            </Route>
+
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<HomePage />} />
+              <Route path="product" element={<Product />} />
+            </Route>
           </Route>
         </Routes>
       </BrowserRouter>
-      <Footer />
-    </div>
+    </LoadingProvider>
   );
 }
 

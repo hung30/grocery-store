@@ -11,6 +11,14 @@ const createNew = async (reqBody) => {
       password: await Bcrypt.hashData(reqBody.password),
     };
 
+    const user = await userModel.findOneByEmailOrPhone(
+      reqBody.email,
+      reqBody.telephone
+    );
+    if (user) {
+      return "";
+    }
+
     const createdUser = await userModel.createNewUser(newUser);
     const result = await userModel.findOneById(createdUser.insertedId);
 

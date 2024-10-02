@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 export default function HomePage() {
   const navigate = useNavigate();
   return (
-    <div className="p-2 mb-5">
+    <div className="mb-5">
       <div className="slider h-[530px] bg-[url('./assets/homepage/dau-bg.jpg')] bg-cover bg-no-repeat bg-center rounded-lg overflow-hidden">
         <div className="w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-60">
           <div className="mx-16 text-white text-center">
