@@ -2,12 +2,15 @@ import { StatusCodes } from "http-status-codes";
 import { productService } from "~/services/productService";
 import ApiError from "~/utils/ApiError";
 import { slugify } from "~/utils/formatters";
+import fs from "fs";
 
 const createNewProduct = async (req, res, next) => {
+  let filePath = null;
   try {
     if (!req.file) {
       throw new ApiError(StatusCodes.BAD_REQUEST, "File không được tải lên");
     }
+    filePath = req.file.path;
     const createdProduct = await productService.createNewProduct(
       req.file,
       req.body
@@ -22,6 +25,14 @@ const createNewProduct = async (req, res, next) => {
     });
   } catch (error) {
     next(error);
+  } finally {
+    if (filePath) {
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, err.message);
+        }
+      });
+    }
   }
 };
 
@@ -78,7 +89,9 @@ const findManyBySlug = async (req, res, next) => {
 };
 
 const updateProduct = async (req, res, next) => {
+  let filePath = null;
   try {
+    filePath = req.file.path;
     const updatedProduct = await productService.updateProduct(
       req.params.id,
       req.body,
@@ -95,6 +108,14 @@ const updateProduct = async (req, res, next) => {
     });
   } catch (error) {
     next(error);
+  } finally {
+    if (filePath) {
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, err.message);
+        }
+      });
+    }
   }
 };
 

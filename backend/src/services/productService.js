@@ -3,17 +3,20 @@ import { ObjectId } from "mongodb";
 import { productModel } from "~/models/productModel";
 import ApiError from "~/utils/ApiError";
 import { slugify } from "~/utils/formatters";
-import cloudinary from "~/config/cloudinartConfig";
+import cloudinary from "~/config/cloudinaryConfig";
 
 const createNewProduct = async (reqFile, reqBody) => {
-  const { path, filename } = reqFile;
+  const uploaded = await cloudinary.uploader.upload(reqFile.path, {
+    folder: "grocery_store",
+  });
+  const { public_id, secure_url } = uploaded;
 
   const newProduct = {
     typeId: new ObjectId(reqBody.typeId),
     name: reqBody.name,
     image: {
-      url: path,
-      imageId: filename,
+      url: secure_url,
+      imageId: public_id,
       alt: reqBody.alt,
     },
     price: reqBody.price,
@@ -23,6 +26,7 @@ const createNewProduct = async (reqFile, reqBody) => {
   };
   const product = await productModel.findOneBySlug(newProduct.slug);
   if (product) {
+    await cloudinary.uploader.destroy(public_id);
     throw new ApiError(StatusCodes.BAD_REQUEST, "Sản phẩm đã tồn tại");
   }
   const createdProduct = await productModel.createNewProduct(newProduct);
@@ -93,10 +97,17 @@ const updateProduct = async (id, reqBody, reqFile) => {
       await cloudinary.uploader.destroy(product.image.imageId);
     }
 
+    // Upload ảnh mới lên Cloudinary
+    const uploaded = await cloudinary.uploader.upload(reqFile.path, {
+      folder: "grocery_store",
+    });
+
+    const { public_id, secure_url } = uploaded;
+
     // Cập nhật ảnh mới
     updatedProductData.image = {
-      url: reqFile.path,
-      imageId: reqFile.filename,
+      url: secure_url,
+      imageId: public_id,
       alt: reqBody.alt,
     };
   }
