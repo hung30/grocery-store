@@ -1,6 +1,7 @@
 import Joi from "joi";
 import { GET_DB } from "~/config/mongodb";
 import { ObjectId } from "mongodb";
+import { verify } from "jsonwebtoken";
 
 //define connection schema
 const USER_COLLECTION_NAME = "users";
@@ -26,23 +27,6 @@ const createNewUser = async (data) => {
     return await GET_DB()
       .collection(USER_COLLECTION_NAME)
       .insertOne(validateData);
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
-const updateUserById = async (id, data) => {
-  try {
-    const { password, createdAt, isAdmin, ...validateData } =
-      await validateBeforeCreateOrUpdateUser(data);
-
-    return await GET_DB()
-      .collection(USER_COLLECTION_NAME)
-      .findOneAndUpdate(
-        { _id: new ObjectId(id) },
-        { $set: { ...validateData, updatedAt: Date.now() } },
-        { returnDocument: "after" }
-      );
   } catch (error) {
     throw new Error(error);
   }
@@ -90,6 +74,37 @@ const deleteUserById = async (id) => {
   }
 };
 
+const updateUserById = async (id, data) => {
+  try {
+    const { password, createdAt, isAdmin, ...validateData } =
+      await validateBeforeCreateOrUpdateUser(data);
+
+    return await GET_DB()
+      .collection(USER_COLLECTION_NAME)
+      .findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: { ...validateData, updatedAt: Date.now() } },
+        { returnDocument: "after" }
+      );
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+const updatePasswordById = async (id, password) => {
+  try {
+    return await GET_DB()
+      .collection(USER_COLLECTION_NAME)
+      .findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: { password: password, updatedAt: Date.now() } },
+        { returnDocument: "after" }
+      );
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 export const userModel = {
   USER_COLLECTION_NAME,
   USER_SCHEMA,
@@ -99,4 +114,5 @@ export const userModel = {
   deleteUserById,
   findOneByEmail,
   findOneByEmailOrPhone,
+  updatePasswordById,
 };

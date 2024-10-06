@@ -89,10 +89,25 @@ const login = async (reqBody) => {
   }
 };
 
+const resetPasswordById = async (id, reqBody) => {
+  try {
+    const user = await userModel.findOneById(id);
+    if (!user) {
+      return false;
+    }
+    const newPassword = await Bcrypt.hashData(reqBody.password);
+    const updatedUser = await userModel.updatePasswordById(id, newPassword);
+    return updatedUser;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const userService = {
   createNew,
   getOneUserById,
   updateUserById,
   deleteUserById,
   login,
+  resetPasswordById,
 };
