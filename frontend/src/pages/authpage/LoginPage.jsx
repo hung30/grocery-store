@@ -6,7 +6,7 @@ import { loginSuccess } from "../../redux/authSlice";
 import { env } from "../../config/environment";
 import { LoadingContext } from "../../contexts/LoadingContext";
 import googleLogo from "../../assets/googleLogo.png";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
   const [userEmail, setUserEmail] = useState("");

@@ -141,6 +141,20 @@ const refreshToken = async (req, res, next) => {
   }
 };
 
+const resetPasswordById = async (req, res, next) => {
+  try {
+    const result = await userService.resetPasswordById(req.userId, req.body);
+    if (result) {
+      return res.status(StatusCodes.OK).json({
+        message: "Đổi mật khẩu thành công",
+      });
+    }
+    throw new ApiError(StatusCodes.NOT_FOUND, "Không tìm thấy user");
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const userController = {
   createNew,
   getOneUserById,
@@ -149,4 +163,5 @@ export const userController = {
   login,
   logout,
   refreshToken,
+  resetPasswordById,
 };
