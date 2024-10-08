@@ -19,7 +19,7 @@ import AdminLayout from "./layouts/AdminLayout";
 import { LoadingContext, LoadingProvider } from "./contexts/LoadingContext";
 import { useContext } from "react";
 import Spinner from "./components/spinner/Spinner";
-import ForgotPasswordPage from "./pages/authpage/ForgotPassWordPage";
+import ForgotPasswordPage from "./pages/authpage/ForgotPasswordPage";
 
 const ProtectedRoutes = () => {
   const user = JSON.parse(localStorage.getItem("userInfo"));

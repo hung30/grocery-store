@@ -10,6 +10,7 @@ import cookieParser from "cookie-parser";
 import session from "express-session";
 import passport from "passport";
 import "~/config/passport";
+import { otpModel } from "./models/otpModel";
 
 const START_SERVER = () => {
   const app = express();
@@ -54,6 +55,7 @@ const START_SERVER = () => {
   try {
     console.log("Connecting to DB");
     await CONNECT_DB();
+    await otpModel.createTTLIndexForDeleteOtpExpired();
     console.log("Connected to DB");
 
     START_SERVER();

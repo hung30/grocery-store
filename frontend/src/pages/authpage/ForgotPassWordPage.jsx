@@ -65,10 +65,21 @@ const ForgotPasswordPage = () => {
     }
   };
 
-  const handleResendOtp = () => {
+  const handleResendOtp = async () => {
     // Gửi lại mã OTP
-    setCountdown(60);
-    setIsResendDisabled(true);
+
+    try {
+      setIsLoading(true);
+      await authorizedAxiosInstance.post(`${env.API_URL}/v1/otp/send-otp`, {
+        email,
+      });
+      setIsLoading(false);
+      setCountdown(60);
+      setIsResendDisabled(true);
+    } catch (error) {
+      setIsLoading(false);
+      console.log(error);
+    }
   };
 
   const formik = useFormik({

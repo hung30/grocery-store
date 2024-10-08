@@ -9,6 +9,9 @@ const OTP_SCHEMA = Joi.object({
   expiredAt: Joi.date()
     .timestamp("javascript")
     .default(() => new Date(Date.now() + 10 * 60 * 1000).getTime()),
+  expiredAtByDate: Joi.date()
+    .timestamp("javascript")
+    .default(() => new Date(Date.now() + 60 * 60 * 1000)),
   createdAt: Joi.date().timestamp("javascript").default(Date.now),
   updatedAt: Joi.date().timestamp("javascript").default(null),
 });
@@ -49,8 +52,19 @@ const deleteOtpById = async (id) => {
   }
 };
 
+const createTTLIndexForDeleteOtpExpired = async () => {
+  try {
+    await GET_DB()
+      .collection(OTP_COLLECTION_NAME)
+      .createIndex({ expiredAtByDate: 1 }, { expireAfterSeconds: 0 });
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 export const otpModel = {
   createNewOtp,
   findLatestOtpByUserId,
   deleteOtpById,
+  createTTLIndexForDeleteOtpExpired,
 };
