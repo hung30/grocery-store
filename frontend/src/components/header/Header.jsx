@@ -46,6 +46,7 @@ export default function Header() {
       setIsLoading(true);
       await handleLogoutAPI();
       dispatch(logout());
+      localStorage.removeItem("quantities");
       message.success("Đăng xuất thành công!");
       setIsLoading(false);
       navigate("/");

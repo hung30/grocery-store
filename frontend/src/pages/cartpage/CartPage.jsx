@@ -26,8 +26,21 @@ function CartPage() {
     setTotalPrice(total);
   }, [cart, quantities]);
 
+  useEffect(() => {
+    const storedQuantities = JSON.parse(localStorage.getItem("quantities"));
+    if (storedQuantities) {
+      setQuantities(storedQuantities);
+    }
+  }, []);
+
   const handleQuantityChange = (productId) => (e) => {
     const newQuantity = parseFloat(e.target.value);
+
+    const storedQuantities =
+      JSON.parse(localStorage.getItem("quantities")) || {};
+    storedQuantities[productId] = newQuantity;
+    localStorage.setItem("quantities", JSON.stringify(storedQuantities));
+
     setQuantities({
       ...quantities,
       [productId]: newQuantity,
@@ -86,7 +99,7 @@ function CartPage() {
                             step={0.1}
                             onChange={handleQuantityChange(item.productId)}
                             className="w-28 border-[1px]  border-gray-500 rounded-md pl-2"
-                            defaultValue={1}
+                            defaultValue={quantities[item.productId] || 1}
                           />
                         </div>
                         <div className="basis-2/4">
