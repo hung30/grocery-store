@@ -123,8 +123,7 @@ const refreshToken = async (req, res, next) => {
     const accessToken = await JwtProvider.generateToken(
       userInfo,
       env.ACCESS_TOKEN_PRIVATE_KEY,
-      // "1m"
-      5
+      "5m"
     );
 
     res.cookie("accessToken", accessToken, {

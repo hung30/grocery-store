@@ -27,7 +27,7 @@ router.get(
     const accessToken = await JwtProvider.generateToken(
       userInfo,
       env.ACCESS_TOKEN_PRIVATE_KEY,
-      "1m"
+      "5m"
     );
 
     const refreshToken = await JwtProvider.generateToken(

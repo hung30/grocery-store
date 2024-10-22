@@ -77,7 +77,10 @@ authorizedAxiosInstance.interceptors.response.use(
     }
 
     if (error.response?.status !== 410) {
-      message.error(error.response?.data?.message || error?.message);
+      message.error(
+        error.response?.data?.message.replace(/^ApiError:\s*/, "") ||
+          error?.message.replace(/^ApiError:\s*/, "")
+      );
     }
 
     return Promise.reject(error);

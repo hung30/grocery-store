@@ -6,9 +6,11 @@ import { message } from "antd";
 import { handleLogoutAPI } from "../../apis/authApis";
 import { useContext } from "react";
 import { LoadingContext } from "../../contexts/LoadingContext";
+import authorizedAxiosInstance from "../../utils/authorizedAxios";
+import { env } from "../../config/environment";
+import { setCart } from "../../redux/cartSlice";
 
 export default function Header() {
-  // const [userInfo, setUserInfo] = useState(false);
   const [isToggleMenu, setIsToggleMenu] = useState(false);
   const [isToggleUser, setIsToggleUser] = useState(false);
   const ref = useRef(null);
@@ -17,6 +19,7 @@ export default function Header() {
   const user = useSelector((state) => state.auth.user);
   const navigate = useNavigate();
   const { setIsLoading } = useContext(LoadingContext);
+  const cartNumberItems = useSelector((state) => state.cart.totalItems);
 
   useEffect(() => {
     const handler = (event) => {
@@ -51,6 +54,23 @@ export default function Header() {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    const cart = async () => {
+      try {
+        const res = await authorizedAxiosInstance.get(
+          `${env.API_URL}/v1/cart/${user._id}`
+        );
+        dispatch(setCart(res.data));
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    if (user) {
+      cart();
+    }
+  }, [user, dispatch]);
 
   return (
     <header
@@ -144,7 +164,7 @@ export default function Header() {
                   />
                 </svg>
                 <div className="rounded-full bg-yellow-400 text-xs text-center px-1.5">
-                  0
+                  {cartNumberItems < 100 ? cartNumberItems : "99+"}
                 </div>
               </a>
             </li>

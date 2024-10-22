@@ -1,29 +1,56 @@
-import React, { useEffect, useState } from "react";
-import { Products } from "./data";
+import React, { useContext, useEffect, useState } from "react";
+// import { Products } from "./data";
 import ReactPaginate from "react-paginate";
 import "./Product.css";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../../redux/authSlice";
+import { LoadingContext } from "../../contexts/LoadingContext";
+import authorizedAxiosInstance from "../../utils/authorizedAxios";
+import { env } from "../../config/environment";
+import { message } from "antd";
+import { addToCart } from "../../redux/cartSlice";
 
 export default function Product() {
-  const [totalPage, setTotalPage] = useState(Math.ceil(Products.length / 6));
+  const [products, setProducts] = useState([]);
+  const [totalPage, setTotalPage] = useState(0);
   const [currentPage, setCurrentPage] = useState(0); // Trang hiện tại bắt đầu từ 0
   const [displayedProducts, setDisplayedProducts] = useState([]);
   const [type, setType] = useState();
   const productsPerPage = 6; // Số lượng sản phẩm trên mỗi trang
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { setIsLoading } = useContext(LoadingContext);
 
   useEffect(() => {
+    const product = async () => {
+      try {
+        setIsLoading(true);
+        const res = await authorizedAxiosInstance.get(
+          `${env.API_URL}/v1/products`
+        );
+        setProducts(res.data);
+        setTotalPage(Math.ceil(products.length / productsPerPage));
+        setIsLoading(false);
+        return res.data;
+      } catch (error) {
+        setIsLoading(false);
+        console.log(error);
+      }
+    };
+    product();
+  }, []);
+
+  useEffect(() => {
+    if (!products || products.length === 0) return;
     const filtered = type
-      ? Products.filter((product) => product.type === type)
-      : Products;
+      ? products.filter((product) => product.type.name === type)
+      : products;
     setTotalPage(Math.ceil(filtered.length / 6));
     const start = currentPage * productsPerPage;
     const end = start + productsPerPage;
     setDisplayedProducts(filtered.slice(start, end));
-  }, [currentPage, productsPerPage, type]);
+  }, [currentPage, products, productsPerPage, type]);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -45,7 +72,22 @@ export default function Product() {
     setType(newType);
     setCurrentPage(0);
   };
-  console.log("displayedProducts", type);
+
+  const handleCart = (productId) => async () => {
+    try {
+      setIsLoading(true);
+      const res = await authorizedAxiosInstance.post(`${env.API_URL}/v1/cart`, {
+        productId,
+      });
+      message.success("Thêm vào giỏ hàng thành công!");
+      dispatch(addToCart(res.data));
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      console.log(error);
+    }
+  };
+
   return (
     <div className="flex flex-col items-center w-full gap-4 mx-auto xl:px-24">
       <div className="text-3xl font-medium p-4 uppercase">Sản phẩm</div>
@@ -63,7 +105,7 @@ export default function Product() {
                 Tất cả sản phẩm
               </button>
             </li>
-            {[...new Set(Products.map((item) => item.type))].map(
+            {[...new Set(products.map((item) => item.type.name))].map(
               (item, index) => (
                 <li key={index}>
                   <button
@@ -118,14 +160,14 @@ export default function Product() {
           <div className="flex flex-wrap gap-4 justify-center xl:justify-normal">
             {displayedProducts.map((item) => (
               <div
-                key={item.id}
+                key={item._id}
                 className="ct-card-item w-[180px] sm:w-[200px] lg:w-[242px] flex flex-col justify-center items-center border-[1px] border-gray-700 p-4"
               >
-                <a href="/product-detail">
+                <a href={`/product-detail/${item._id}`}>
                   <img
-                    src="https://sieuthivivo.com/wp-content/uploads/2020/12/dau-do-organic-1kg-compress-compress-compress.jpg"
-                    alt="đậu đỏ"
-                    width={200}
+                    src={item.image.url}
+                    alt={item.name.alt}
+                    className="w-[200px] h-[200px]"
                   />
                 </a>
                 <div className="text-xl font-semibold mt-2">{item.name}</div>
@@ -133,10 +175,13 @@ export default function Product() {
                   Giá: {item.price} <sup>đ/kg</sup>
                 </div>
                 <div className="text-base mt-2">
-                  Số lượng: {item.quantity} <sup>kg</sup>
+                  Số lượng: {item.countInStock} <sup>kg</sup>
                 </div>
                 <div className="ct-form-item mt-3 text-center flex gap-2 w-full">
-                  <button className="uppercase bg-blue-400 text-yellow-100 tracking-wider text-xs font-semibold rounded hover:bg-opacity-80 p-2 w-4/5 lg:w-full basis-1/3">
+                  <button
+                    onClick={handleCart(item._id)}
+                    className="uppercase bg-blue-400 text-yellow-100 tracking-wider text-xs font-semibold rounded hover:bg-opacity-80 p-2 w-4/5 lg:w-full basis-1/3"
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
