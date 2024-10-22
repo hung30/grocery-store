@@ -6,6 +6,7 @@ import { authGoogle } from "./authGoogle";
 import { typeRoute } from "./typeRoute";
 import { productRoute } from "./productRoute";
 import { otpRoute } from "./otpRoute";
+import { cartRoute } from "./cartRoute";
 
 const Router = express.Router();
 
@@ -26,5 +27,7 @@ Router.use("/types", typeRoute);
 Router.use("/products", productRoute);
 
 Router.use("/otp", otpRoute);
+
+Router.use("/cart", cartRoute);
 
 export const APIs_V1 = Router;
