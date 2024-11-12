@@ -39,9 +39,15 @@ const START_SERVER = () => {
   // middleware xử lý lỗi tập trung
   app.use(errorHandlingMiddleware);
 
-  app.listen(env.PORT, env.APP_HOST, () => {
-    console.log(`Server running at http://${env.APP_HOST}:${env.PORT}/`);
-  });
+  if (env.BUILD_MODE === "production") {
+    app.listen(process.env.PORT, () => {
+      console.log(`Server running at Port: ${process.env.PORT}`);
+    });
+  } else {
+    app.listen(env.PORT, env.APP_HOST, () => {
+      console.log(`Server running at http://${env.APP_HOST}:${env.PORT}/`);
+    });
+  }
 
   // Close mongoDB connection when exit app
   exitHook(() => {
