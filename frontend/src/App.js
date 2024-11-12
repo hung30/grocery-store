@@ -11,6 +11,7 @@ import HomePage from "./pages/homepage/HomePage";
 import Product from "./pages/product/Product";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
+import ForgotPasswordPage from "./pages/authpage/ForgotPasswordPage";
 import LoginPage from "./pages/authpage/LoginPage";
 import RegisterPage from "./pages/authpage/RegisterPage";
 import NewsPage from "./pages/authpage/NewsPage";
@@ -19,7 +20,6 @@ import AdminLayout from "./layouts/AdminLayout";
 import { LoadingContext, LoadingProvider } from "./contexts/LoadingContext";
 import { useContext } from "react";
 import Spinner from "./components/spinner/Spinner";
-// import ForgotPasswordPage from "./pages/authpage/ForgotPasswordPage";
 
 const ProtectedRoutes = () => {
   const user = JSON.parse(localStorage.getItem("userInfo"));
@@ -70,7 +70,7 @@ function App() {
             <Route element={<UnauthorizedRoutes />}>
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
-              // <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             </Route>
 
             <Route element={<ProtectedRoutes />}>
