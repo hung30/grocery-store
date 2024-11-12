@@ -8,7 +8,8 @@ import { env } from "../../config/environment";
 import { message } from "antd";
 import { useNavigate } from "react-router-dom";
 
-const ForgotPasswordPage = () => {
+export default function RegisterPage() {
+export default function ForgotPasswordPage() {
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
@@ -242,6 +243,4 @@ const ForgotPasswordPage = () => {
       )}
     </div>
   );
-};
-
-export default ForgotPasswordPage;
+}
