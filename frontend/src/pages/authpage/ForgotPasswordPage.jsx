@@ -1,43 +1,93 @@
-import React, { useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Input from "../../components/textfield/Input";
-import authorizedAxiosInstance from "./../../utils/authorizedAxios";
-import { env } from "../../config/environment";
-import { LoadingContext } from "./../../contexts/LoadingContext";
-import { Link, useNavigate } from "react-router-dom";
-import { message } from "antd";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { LoadingContext } from "../../contexts/LoadingContext";
+import authorizedAxiosInstance from "../../utils/authorizedAxios";
+import { env } from "../../config/environment";
+import { message } from "antd";
+import { Link, useNavigate } from "react-router-dom";
 
-export default function RegisterPage() {
+export default function ForgotPasswordPage() {
+  const [step, setStep] = useState(1);
+  const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const [countdown, setCountdown] = useState(60);
+  const [isResendDisabled, setIsResendDisabled] = useState(true);
   const { setIsLoading } = useContext(LoadingContext);
+  const [token, setToken] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    let timer;
+    if (countdown > 0) {
+      timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+    } else {
+      setIsResendDisabled(false);
+    }
+    return () => clearTimeout(timer);
+  }, [countdown]);
+
+  const handleEmailSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setIsLoading(true);
+      await authorizedAxiosInstance.post(`${env.API_URL}/v1/otp/send-otp`, {
+        email,
+      });
+      setIsLoading(false);
+      setStep(2);
+      setCountdown(60);
+      setIsResendDisabled(true);
+    } catch (error) {
+      setIsLoading(false);
+      console.log(error);
+    }
+  };
+
+  const handleOtpSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setIsLoading(true);
+      const res = await authorizedAxiosInstance.post(
+        `${env.API_URL}/v1/otp/verify-otp`,
+        {
+          email,
+          otp,
+        }
+      );
+      setToken(res.data.verifyOtp);
+      setIsLoading(false);
+      setStep(3);
+    } catch (error) {
+      setIsLoading(false);
+      console.log(error);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    // Gửi lại mã OTP
+
+    try {
+      setIsLoading(true);
+      await authorizedAxiosInstance.post(`${env.API_URL}/v1/otp/send-otp`, {
+        email,
+      });
+      setIsLoading(false);
+      setCountdown(60);
+      setIsResendDisabled(true);
+    } catch (error) {
+      setIsLoading(false);
+      console.log(error);
+    }
+  };
 
   const formik = useFormik({
     initialValues: {
-      email: "",
-      telephone: "",
-      name: "",
       password: "",
       confirmPassword: "",
     },
     validationSchema: Yup.object({
-      email: Yup.string()
-        .required("Email không được để trống")
-        .email("Email không hợp lệ")
-        .trim()
-        .strict(),
-      telephone: Yup.string()
-        .required("Số điện thoại không được để trống")
-        .min(10, "Số điện thoại không hợp lệ")
-        .max(10, "Số điện thoại không hợp lệ")
-        .trim()
-        .strict(),
-      name: Yup.string()
-        .required("Tên không được để trống")
-        .min(1, "Tên phải lớn hơn 1 ký tự")
-        .max(30, "Tên phải bé hơn 30 ký tự")
-        .trim()
-        .strict(),
       password: Yup.string()
         .required("Mật khẩu không được để trống")
         .matches(
@@ -57,60 +107,117 @@ export default function RegisterPage() {
         .oneOf([Yup.ref("password"), null], "Mật khẩu phải trùng nhau"),
     }),
     onSubmit: async (values) => {
+      const { password } = values;
       try {
         setIsLoading(true);
-        const { confirmPassword, ...data } = values;
-        await authorizedAxiosInstance.post(`${env.API_URL}/v1/users`, data);
+        await authorizedAxiosInstance.put(
+          `${env.API_URL}/v1/users/reset-password`,
+          { password },
+          { headers: { Authorization: token } }
+        );
         setIsLoading(false);
-        message.success("Đăng ký thành công");
+        message.success("Đổi mật khẩu thành công");
         navigate("/login");
       } catch (error) {
         setIsLoading(false);
-        console.error(error);
+        console.log(error);
       }
     },
   });
 
   return (
-    <div className="flex flex-col justify-start items-center">
-      <div className="w-full p-10  md:w-1/2 lg:w-1/3 xl:w-1/4 mt-8">
-        <div className="text-2xl text-blue-500 font-medium text-center uppercase">
-          Đăng ký
-        </div>
-        <div className="text-gray-500 mb-10 text-center">
-          Tạo tài khoản mới của bạn
-        </div>
-        <form onSubmit={formik.handleSubmit} autoComplete="off">
+    <div className="flex flex-col items-center justify-center bg-gray-100">
+      {step === 1 && (
+        <form
+          onSubmit={handleEmailSubmit}
+          className="bg-white p-6 rounded shadow-md w-80"
+        >
+          <div className="text-2xl text-blue-500 font-medium text-center uppercase">
+            Quên mật khẩu
+          </div>
+          <div className="text-gray-500 mb-10 text-center">
+            Nhập email để nhận mã OTP
+          </div>
+
+          <Input
+            type="email"
+            placeholder="Email"
+            setData={(e) => setEmail(e.target.value)}
+          />
+          <div className="text-end mb-10 mt-1">
+            <div>
+              Đã nhớ mật khẩu?{" "}
+              <span>
+                <Link to="/login" className="text-blue-500 ">
+                  Đăng nhập
+                </Link>
+              </span>
+            </div>
+          </div>
+          <button
+            type="submit"
+            className="w-full bg-blue-500 text-white p-2 rounded"
+          >
+            Gửi OTP
+          </button>
+        </form>
+      )}
+      {step === 2 && (
+        <form
+          onSubmit={handleOtpSubmit}
+          className="bg-white p-6 rounded shadow-md w-80"
+        >
+          <div className="text-2xl text-blue-500 font-medium text-center uppercase">
+            Nhập OTP
+          </div>
+          <div className="text-gray-500 mb-10 text-center">
+            Nhập mã OTP đã được gửi đến email của bạn
+          </div>
+
+          <Input
+            type="text"
+            placeholder="OTP"
+            setData={(e) => setOtp(e.target.value)}
+          />
+
+          <button
+            type="submit"
+            className="w-full bg-blue-500 text-white p-2 rounded mt-4"
+          >
+            Xác thực OTP
+          </button>
+          <div className="mt-4 text-center text-gray-500">
+            {isResendDisabled ? (
+              <span>Không nhận được OTP? Gửi lại trong {countdown}s</span>
+            ) : (
+              <button
+                type="button"
+                onClick={handleResendOtp}
+                className="text-blue-500 underline"
+              >
+                Gửi lại OTP
+              </button>
+            )}
+          </div>
+        </form>
+      )}
+      {step === 3 && (
+        <form
+          onSubmit={formik.handleSubmit}
+          className="bg-white p-6 rounded shadow-md w-80"
+        >
+          <div className="text-2xl text-blue-500 font-medium text-center uppercase">
+            Thay đổi mật khẩu
+          </div>
+          <div className="text-gray-500 mb-10 text-center">
+            Đổi lại mật khẩu mới cho bạn
+          </div>
           <div className="flex flex-col mb-14 gap-4">
-            <Input
-              type="text"
-              id="email"
-              name="email"
-              placeholder="Email *"
-              setData={formik.handleChange}
-              error={formik.touched.email && formik.errors.email}
-            />
-            <Input
-              type="text"
-              id="telephone"
-              name="telephone"
-              placeholder="Số điện thoại *"
-              setData={formik.handleChange}
-              error={formik.touched.telephone && formik.errors.telephone}
-            />
-            <Input
-              type="text"
-              id="name"
-              name="name"
-              placeholder="Tên *"
-              setData={formik.handleChange}
-              error={formik.touched.name && formik.errors.name}
-            />
             <Input
               type="password"
               id="password"
               name="password"
-              placeholder="Mật khẩu *"
+              placeholder="Mật khẩu"
               setData={formik.handleChange}
               error={formik.touched.password && formik.errors.password}
             />
@@ -118,7 +225,7 @@ export default function RegisterPage() {
               type="password"
               id="confirmPassword"
               name="confirmPassword"
-              placeholder="Nhập lai mật khẩu *"
+              placeholder="Nhập lai mật khẩu"
               setData={formik.handleChange}
               error={
                 formik.touched.confirmPassword && formik.errors.confirmPassword
@@ -129,16 +236,10 @@ export default function RegisterPage() {
             type="submit"
             className="w-full bg-blue-500 text-white px-4 py-2 rounded"
           >
-            Đăng ký
+            Đổi mật khẩu
           </button>
         </form>
-        <div className="text-center p-3">
-          Đã có tài khoản?,{" "}
-          <span className="text-blue-500">
-            <Link to="/login">Đăng nhập</Link>
-          </span>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
