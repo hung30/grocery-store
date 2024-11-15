@@ -11,6 +11,7 @@ import HomePage from "./pages/homepage/HomePage";
 import Product from "./pages/product/Product";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
+import ForgotPasswordPage from "./pages/authpage/ForgotPasswordPage";
 import LoginPage from "./pages/authpage/LoginPage";
 import RegisterPage from "./pages/authpage/RegisterPage";
 import NewsPage from "./pages/authpage/NewsPage";
