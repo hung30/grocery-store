@@ -7,6 +7,7 @@ import { typeRoute } from "./typeRoute";
 import { productRoute } from "./productRoute";
 import { otpRoute } from "./otpRoute";
 import { cartRoute } from "./cartRoute";
+import { orderRoute } from "./orderRoute";
 
 const Router = express.Router();
 
@@ -29,5 +30,7 @@ Router.use("/products", productRoute);
 Router.use("/otp", otpRoute);
 
 Router.use("/cart", cartRoute);
+
+Router.use("/orders", orderRoute);
 
 export const APIs_V1 = Router;

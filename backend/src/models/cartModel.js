@@ -74,9 +74,20 @@ const deleteProductInCart = async (userId, productId) => {
   }
 };
 
+const deleteAllProductsInCartByUserId = async (userId) => {
+  try {
+    return await GET_DB()
+      .collection(CART_COLLECTION_NAME)
+      .deleteMany({ userId: new ObjectId(userId) });
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 export const cartModel = {
   createNewCart,
   getCartByUserId,
   findProductInCart,
   deleteProductInCart,
+  deleteAllProductsInCartByUserId,
 };

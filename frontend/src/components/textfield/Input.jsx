@@ -3,7 +3,15 @@ import EyeIcon from "../icons/EyeIcon";
 import EyeSlashIcon from "../icons/EyeSlashIcon";
 
 export default function Input(props) {
-  const { type, id, name, setData, placeholder, error } = props;
+  const {
+    type,
+    id,
+    name,
+    setData,
+    placeholder,
+    error,
+    autoComplete = "on",
+  } = props;
   const [inputType, setInputType] = useState(type);
   const [icon, setIcon] = useState(type === "password" ? <EyeIcon /> : null);
 
@@ -25,6 +33,7 @@ export default function Input(props) {
           name={name}
           placeholder={placeholder}
           onChange={setData}
+          autoComplete={autoComplete}
           className={`p-2 bg-slate-200 border-[1px] rounded outline-none hover:border-gray-500 focus:border-gray-500 placeholder:text-gray-500 pr-10 w-full duration-500 ${
             error ? "border-red-500" : ""
           }`}

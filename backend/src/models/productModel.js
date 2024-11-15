@@ -145,8 +145,25 @@ const updateProductById = async (id, data) => {
       .collection(PRODUCT_COLLECTION_NAME)
       .updateOne(
         { _id: new ObjectId(id) },
-        { $set: { ...validateData, updatedAt: Date.now() } },
-        { returnDocument: "after" }
+        { $set: { ...validateData, updatedAt: Date.now() } }
+      );
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+const updateCountInStock = async (id, newCountInStock) => {
+  try {
+    return await GET_DB()
+      .collection(PRODUCT_COLLECTION_NAME)
+      .updateOne(
+        { _id: new ObjectId(id) },
+        {
+          $set: {
+            countInStock: newCountInStock,
+            updatedAt: Date.now(),
+          },
+        }
       );
   } catch (error) {
     throw new Error(error);
@@ -161,4 +178,5 @@ export const productModel = {
   deleteProductById,
   findManyBySlug,
   updateProductById,
+  updateCountInStock,
 };

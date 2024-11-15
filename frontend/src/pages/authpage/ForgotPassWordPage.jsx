@@ -6,9 +6,9 @@ import { LoadingContext } from "../../contexts/LoadingContext";
 import authorizedAxiosInstance from "../../utils/authorizedAxios";
 import { env } from "../../config/environment";
 import { message } from "antd";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-const ForgotPasswordPage = () => {
+export default function ForgotPasswordPage() {
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
@@ -148,9 +148,9 @@ const ForgotPasswordPage = () => {
             <div>
               Đã nhớ mật khẩu?{" "}
               <span>
-                <a href="/login" className="text-blue-500 ">
+                <Link to="/login" className="text-blue-500 ">
                   Đăng nhập
-                </a>
+                </Link>
               </span>
             </div>
           </div>
@@ -242,6 +242,4 @@ const ForgotPasswordPage = () => {
       )}
     </div>
   );
-};
-
-export default ForgotPasswordPage;
+}

@@ -10,6 +10,8 @@ import authorizedAxiosInstance from "../../utils/authorizedAxios";
 import { env } from "../../config/environment";
 import { message } from "antd";
 import { addToCart } from "../../redux/cartSlice";
+import BuyProductForm from "../../components/buyProductForm/BuyProductForm";
+import { set } from "./../../../node_modules/moment/src/lib/moment/get-set";
 
 export default function Product() {
   const [products, setProducts] = useState([]);
@@ -81,6 +83,33 @@ export default function Product() {
       });
       message.success("Thêm vào giỏ hàng thành công!");
       dispatch(addToCart(res.data));
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      console.log(error);
+    }
+  };
+
+  const handlePurchase = async (values) => {
+    const data = {
+      nameOrder: values.userData.nameOrder,
+      userInfo: {
+        name: values.name,
+        telephone: values.telephone,
+        address: values.address,
+      },
+      items: [
+        { productId: values.userData.productId, quantity: values.quantity },
+      ],
+      totalPrice: (
+        parseFloat(values.userData.price) * parseFloat(values.quantity)
+      ).toString(),
+    };
+    try {
+      setIsLoading(true);
+      await authorizedAxiosInstance.post(`${env.API_URL}/v1/orders`, data);
+      message.success("Đặt hàng thành công!");
+      navigate("/order");
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
@@ -197,9 +226,17 @@ export default function Product() {
                       />
                     </svg>
                   </button>
-                  <button className="basis-2/3 bg-blue-400 uppercase text-yellow-100 tracking-wider text-xs font-semibold rounded hover:bg-opacity-80">
-                    Mua ngay
-                  </button>
+                  <BuyProductForm
+                    classButtonName="basis-2/3 bg-blue-400 uppercase text-yellow-100 tracking-wider text-xs font-semibold rounded hover:bg-opacity-80"
+                    buttonText="Mua ngay"
+                    onPurchase={handlePurchase}
+                    countInStock={item.countInStock}
+                    userData={{
+                      productId: item._id,
+                      price: item.price,
+                      nameOrder: item.name,
+                    }}
+                  />
                 </div>
               </div>
             ))}
