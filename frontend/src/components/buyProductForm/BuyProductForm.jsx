@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Modal, Form, Input, message } from "antd";
+import { useNavigate } from "react-router-dom";
 
 const BuyProductForm = ({
   buttonText,
@@ -9,6 +10,7 @@ const BuyProductForm = ({
   userData,
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("userInfo"));
   const initialValues = {
     name: user?.name,
@@ -17,7 +19,12 @@ const BuyProductForm = ({
   };
 
   const showModal = () => {
-    setIsModalVisible(true);
+    if (!user) {
+      message.error("Vui lòng đăng nhập để mua hàng!");
+      navigate("/login");
+    } else {
+      setIsModalVisible(true);
+    }
   };
 
   const handleOk = () => {

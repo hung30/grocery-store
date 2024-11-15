@@ -103,8 +103,20 @@ const login = async (req, res, next) => {
 
 const logout = async (req, res, next) => {
   try {
-    res.clearCookie("accessToken");
-    res.clearCookie("refreshToken");
+    res.clearCookie("accessToken", {
+      path: "/",
+      domain:
+        env.BUILD_MODE === "production"
+          ? "grocery-store-jade-ten.vercel.app"
+          : "localhost",
+    });
+    res.clearCookie("refreshToken", {
+      path: "/",
+      domain:
+        env.BUILD_MODE === "production"
+          ? "grocery-store-jade-ten.vercel.app"
+          : "localhost",
+    });
     return res.status(StatusCodes.OK).json({ message: "Đăng xuất thành công" });
   } catch (error) {
     next(error);
