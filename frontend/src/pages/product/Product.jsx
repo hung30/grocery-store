@@ -11,7 +11,6 @@ import { env } from "../../config/environment";
 import { message } from "antd";
 import { addToCart } from "../../redux/cartSlice";
 import BuyProductForm from "../../components/buyProductForm/BuyProductForm";
-import { set } from "./../../../node_modules/moment/src/lib/moment/get-set";
 
 export default function Product() {
   const [products, setProducts] = useState([]);
@@ -23,6 +22,7 @@ export default function Product() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { setIsLoading } = useContext(LoadingContext);
+  const user = JSON.parse(localStorage.getItem("userInfo"));
 
   useEffect(() => {
     const product = async () => {
@@ -76,6 +76,11 @@ export default function Product() {
   };
 
   const handleCart = (productId) => async () => {
+    if (!user) {
+      message.error("Vui lòng đăng nhập để thêm vào giỏ hàng!");
+      navigate("/login");
+      return;
+    }
     try {
       setIsLoading(true);
       const res = await authorizedAxiosInstance.post(`${env.API_URL}/v1/cart`, {
