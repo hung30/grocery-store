@@ -19,7 +19,7 @@ router.get(
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    failureRedirect: "http://localhost:3000/login",
+    failureRedirect: `${env.URL_FRONTEND}/login`,
   }),
   async (req, res) => {
     // Đăng nhập thành công, chuyển hướng về trang chủ
@@ -49,7 +49,7 @@ router.get(
         maxAge: ms("14 days"),
       });
     res.redirect(
-      `http://localhost:3000/product?user=${encodeURIComponent(
+      `${env.URL_FRONTEND}/product?user=${encodeURIComponent(
         JSON.stringify(userInfo)
       )}`
     );
