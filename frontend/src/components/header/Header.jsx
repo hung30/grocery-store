@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/authSlice";
 import { message } from "antd";
@@ -80,27 +80,32 @@ export default function Header() {
     >
       <nav className="flex flex-row justify-between items-center">
         <div className="logo basis-2/6 text-center text-xl font-semibold cursor-pointer pl-2">
-          <a href="/">TùngStore.</a>
+          <Link to="/">TùngStore.</Link>
         </div>
         <ul
           id="ct-top-menu"
           className="basis-3/6 hidden lg:flex lg:items-center lg:justify-end lg:gap-8 uppercase"
         >
           <li className={`ct-top-menu-item ${getNavLinkClass("/")}`}>
-            <a href="/">Trang chủ</a>
+            <Link to="/">Trang chủ</Link>
           </li>
           <li className={`ct-top-menu-item ${getNavLinkClass("/product")}`}>
-            <a href="/product">Sản phẩm</a>
+            <Link to="/product">Sản phẩm</Link>
           </li>
           <li className={`ct-top-menu-item ${getNavLinkClass("/news")}`}>
-            <a href="/news">Tin tức</a>
+            <Link to="/news">Tin tức</Link>
           </li>
           <li className={`ct-top-menu-item ${getNavLinkClass("/contact")}`}>
-            <a href="/contact">Liên hệ</a>
+            <Link to="/contact">Liên hệ</Link>
           </li>
+          {user && !user.isAdmin && (
+            <li className={`ct-top-menu-item ${getNavLinkClass("/order")}`}>
+              <Link to="/order">Đơn đặt</Link>
+            </li>
+          )}
           {user?.isAdmin && (
-            <li className={`ct-top-menu-item ${getNavLinkClass("/contact")}`}>
-              <a href="/admin">Admin</a>
+            <li className={`ct-top-menu-item ${getNavLinkClass("/admin")}`}>
+              <Link to="/admin">Admin</Link>
             </li>
           )}
         </ul>
@@ -108,48 +113,48 @@ export default function Header() {
           location.pathname !== "/login" &&
           location.pathname !== "/register" && (
             <div className="hidden lg:flex justify-center items-center lg:basis-1/6 text-sm xl:text-base mr-2 gap-2">
-              <a
-                href="/register"
+              <Link
+                to="/register"
                 title="Đăng ký"
                 className="bg-blue-500 p-2 rounded"
               >
                 Đăng ký
-              </a>
-              <a
-                href="/login"
+              </Link>
+              <Link
+                to="/login"
                 title="Đăng nhập"
                 className="bg-blue-500 p-2 rounded"
               >
                 Đăng nhập
-              </a>
+              </Link>
             </div>
           )}
         {!user && location.pathname === "/register" && (
           <div className="hidden lg:block lg:basis-1/6 lg:text-end lg:ml-16 mr-4">
-            <a
-              href="/login"
+            <Link
+              to="/login"
               title="Đăng nhập"
               className="bg-blue-500 p-2 rounded"
             >
               Đăng nhập
-            </a>
+            </Link>
           </div>
         )}
         {!user && location.pathname === "/login" && (
           <div className="hidden lg:block lg:basis-1/6 lg:text-end lg:ml-16 mr-4">
-            <a
-              href="/register"
+            <Link
+              to="/register"
               title="Đăng ký"
               className="bg-blue-500 p-2 rounded"
             >
               Đăng ký
-            </a>
+            </Link>
           </div>
         )}
         {user && (
           <ul className="basis-4/6 lg:basis-1/6 flex items-center justify-end lg:justify-end ml-16 gap-2">
             <li>
-              <a href="/cart" title="cart" className="flex items-center">
+              <Link to="/cart" title="cart" className="flex items-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -167,7 +172,7 @@ export default function Header() {
                 <div className="rounded-full bg-yellow-400 text-xs text-center px-1.5">
                   {cartNumberItems < 100 ? cartNumberItems : "99+"}
                 </div>
-              </a>
+              </Link>
             </li>
             <li
               title={user?.name ? user.name : "User"}
@@ -214,13 +219,15 @@ export default function Header() {
               {isToggleUser && (
                 <ul className="absolute z-50 top-6 right-0 bg-white text-black text-sm p-2 whitespace-nowrap rounded-sm animate-sliceDown">
                   <li className="border-b border-gray-300 pb-1">
-                    <a href="/">Cá nhân</a>
+                    <Link to="/">Cá nhân</Link>
                   </li>
-                  <li className="border-b border-gray-300 py-1">
-                    <a href="/user">Đơn đặt</a>
-                  </li>
+                  {!user?.isAdmin && (
+                    <li className="border-b border-gray-300 py-1">
+                      <Link to="/order">Đơn đặt</Link>
+                    </li>
+                  )}
                   {/* <li className="border-b border-gray-300 py-1">
-                    <a href="/setting">Cài đặt</a>
+                    <Link to="/setting">Cài đặt</Link>
                   </li> */}
                   <li className="py-1">
                     <button onClick={handleLogout}>Đăng xuất</button>
@@ -269,33 +276,43 @@ export default function Header() {
           {isToggleMenu && user && (
             <ul className="absolute z-50 top-7 right-0 bg-white text-black text-sm p-2 whitespace-nowrap rounded-sm animate-sliceDown">
               <li className="border-b border-gray-300 py-1">
-                <a href="/">Trang chủ</a>
+                <Link to="/">Trang chủ</Link>
               </li>
-              <li className="border-b border-gray-300 py-1">
-                <a href="/user">
-                  {user?.name.length <= 7
-                    ? user.name
-                    : user.name.slice(user.name.lastIndexOf(" ") + 1)}
-                </a>
-              </li>
-              <li className="border-b border-gray-300 py-1">
-                <a href="/order">Đơn đặt</a>
-              </li>
+              {!user?.isAdmin && (
+                <li className="border-b border-gray-300 py-1">
+                  <Link to="/user">
+                    {user?.name.length <= 7
+                      ? user.name
+                      : user.name.slice(user.name.lastIndexOf(" ") + 1)}
+                  </Link>
+                </li>
+              )}
+              {!user?.isAdmin && (
+                <li className="border-b border-gray-300 py-1">
+                  <Link to="/order">Đơn đặt</Link>
+                </li>
+              )}
               {/* <li className="border-b border-gray-300 py-1">
-                <a href="/setting">Cài đặt</a>
+                <Link to="/setting">Cài đặt</Link>
               </li> */}
+
               <li className="border-b border-gray-300 py-1">
-                <a href="/product">Sản phẩm</a>
+                <Link to="/product">Sản phẩm</Link>
               </li>
-              <li className="border-b border-gray-300 py-1">
-                <a href="/news">Tin tức</a>
-              </li>
-              <li className="border-b border-gray-300 py-1">
-                <a href="/contact">Liên hệ</a>
-              </li>
+
+              {!user?.isAdmin && (
+                <li className="border-b border-gray-300 py-1">
+                  <Link to="/news">Tin tức</Link>
+                </li>
+              )}
+              {!user?.isAdmin && (
+                <li className="border-b border-gray-300 py-1">
+                  <Link to="/contact">Liên hệ</Link>
+                </li>
+              )}
               {user?.isAdmin && (
                 <li className="border-b border-gray-300 py-1">
-                  <a href="/admin">Admin</a>
+                  <Link to="/admin">Admin</Link>
                 </li>
               )}
               <li className="">
@@ -306,25 +323,25 @@ export default function Header() {
           {isToggleMenu && !user && (
             <ul className="absolute z-50 top-7 right-0 bg-white text-black text-sm p-2 whitespace-nowrap rounded-sm animate-sliceDown">
               <li className="border-b border-gray-300 py-1">
-                <a href="/">Trang chủ</a>
+                <Link to="/">Trang chủ</Link>
               </li>
               {/* <li className="border-b border-gray-300 py-1">
-                <a href="/setting">Cài đặt</a>
+                <Link to="/setting">Cài đặt</Link>
               </li> */}
               <li className="border-b border-gray-300 py-1">
-                <a href="/product">Sản phẩm</a>
+                <Link to="/product">Sản phẩm</Link>
               </li>
               <li className="border-b border-gray-300 py-1">
-                <a href="/news">Tin tức</a>
+                <Link to="/news">Tin tức</Link>
               </li>
               <li className="border-b border-gray-300 py-1">
-                <a href="/contact">Liên hệ</a>
+                <Link to="/contact">Liên hệ</Link>
               </li>
               <li className="border-b border-gray-300 py-1">
-                <a href="/login">Đăng nhập</a>
+                <Link to="/login">Đăng nhập</Link>
               </li>
               <li className="pt-1">
-                <a href="/register">Đăng ký</a>
+                <Link to="/register">Đăng ký</Link>
               </li>
             </ul>
           )}

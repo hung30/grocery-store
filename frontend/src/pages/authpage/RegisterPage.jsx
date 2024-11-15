@@ -3,7 +3,7 @@ import Input from "../../components/textfield/Input";
 import authorizedAxiosInstance from "./../../utils/authorizedAxios";
 import { env } from "../../config/environment";
 import { LoadingContext } from "./../../contexts/LoadingContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { message } from "antd";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -80,7 +80,7 @@ export default function RegisterPage() {
         <div className="text-gray-500 mb-10 text-center">
           Tạo tài khoản mới của bạn
         </div>
-        <form onSubmit={formik.handleSubmit}>
+        <form onSubmit={formik.handleSubmit} autoComplete="off">
           <div className="flex flex-col mb-14 gap-4">
             <Input
               type="text"
@@ -135,7 +135,7 @@ export default function RegisterPage() {
         <div className="text-center p-3">
           Đã có tài khoản?,{" "}
           <span className="text-blue-500">
-            <a href="/login">Đăng nhập</a>
+            <Link to="/login">Đăng nhập</Link>
           </span>
         </div>
       </div>

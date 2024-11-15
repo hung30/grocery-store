@@ -50,8 +50,28 @@ const deleteProductInCart = async (req, res, next) => {
   }
 };
 
+const deleteAllProductsInCartByUserId = async (req, res, next) => {
+  try {
+    const userId = req.params.userId;
+
+    const deleted = await cartService.deleteAllProductsInCartByUserId(userId);
+    if (!deleted) {
+      throw new ApiError(
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        "Xóa tất cả sản phẩm trong giỏ hàng thất bại"
+      );
+    }
+    return res
+      .status(StatusCodes.OK)
+      .json({ message: "Xóa tất cả sản phẩm trong giỏ hàng thành công" });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const cartController = {
   createNewCart,
   getCartByUserId,
   deleteProductInCart,
+  deleteAllProductsInCartByUserId,
 };

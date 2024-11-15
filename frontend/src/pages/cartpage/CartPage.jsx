@@ -5,23 +5,44 @@ import { LoadingContext } from "../../contexts/LoadingContext";
 import authorizedAxiosInstance from "../../utils/authorizedAxios";
 import { env } from "../../config/environment";
 import { message } from "antd";
-import { setCart } from "../../redux/cartSlice";
+import { clearCart, setCart } from "../../redux/cartSlice";
+import BuyProductForm from "../../components/buyProductForm/BuyProductForm";
+import { Link } from "react-router-dom";
 
 function CartPage() {
-  const cart = useSelector((state) => state.cart.cartItems);
+  // const cart = useSelector((state) => state.cart.cartItems);
+  const [cart, setCart] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
   const [quantities, setQuantities] = useState({});
   const { setIsLoading } = useContext(LoadingContext);
   const dispatch = useDispatch();
 
   useEffect(() => {
+    const cartData = async () => {
+      const userId = JSON.parse(localStorage.getItem("userInfo"))._id;
+      try {
+        setIsLoading(true);
+        const res = await authorizedAxiosInstance.get(
+          `${env.API_URL}/v1/cart/${userId}`
+        );
+        setCart(res.data);
+        setIsLoading(false);
+        return res.data;
+      } catch (error) {
+        setIsLoading(false);
+        console.log(error);
+      }
+    };
+    cartData();
+  }, []);
+
+  useEffect(() => {
     let total = 0;
     cart.forEach((item) => {
-      const quantity = quantities[item.productId] || 1;
-      const priceToInt = parseInt(item.products.price);
+      const quantity = quantities[item?.productId] || 1;
+      const priceToInt = parseFloat(item?.products?.price);
 
       total += priceToInt * quantity;
-      console.log(total);
     });
     setTotalPrice(total);
   }, [cart, quantities]);
@@ -62,29 +83,69 @@ function CartPage() {
     }
   };
 
+  const handlePurchase = async (values) => {
+    let nameOrder = "";
+    cart.forEach((item, index) => {
+      nameOrder += item.products.name;
+      if (index < cart.length - 1) {
+        nameOrder += ", ";
+      }
+    });
+    const orderItems = {
+      nameOrder: nameOrder,
+      userInfo: values,
+      items: cart.map((item) => {
+        return {
+          productId: item.productId,
+          quantity: quantities[item.productId]
+            ? quantities[item.productId].toString()
+            : "1",
+        };
+      }),
+      totalPrice: totalPrice.toString(),
+    };
+    const user = JSON.parse(localStorage.getItem("userInfo"));
+    const userId = user._id;
+    try {
+      setIsLoading(true);
+      await authorizedAxiosInstance.post(
+        `${env.API_URL}/v1/orders`,
+        orderItems
+      );
+      await authorizedAxiosInstance.delete(`${env.API_URL}/v1/cart/${userId}`);
+      dispatch(clearCart);
+      message.success("Đặt hàng thành công!");
+      dispatch(setCart([]));
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      console.log(error);
+    }
+  };
+
   return (
-    <div class="bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
-      <div class="mx-auto max-w-screen-xl px-4 2xl:px-0">
-        <h2 class="text-xl text-center font-semibold text-gray-900 dark:text-white sm:text-2xl sm:text-start">
+    <div className="bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
+      <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
+        <h2 className="text-xl text-center font-semibold text-gray-900 dark:text-white sm:text-2xl sm:text-start">
           Giỏ hàng của bạn
         </h2>
-        {cart.length === 0 ? (
+        {cart?.length === 0 ? (
           <div>Chưa có sản phẩm nào trong giỏ hàng</div>
         ) : (
-          <div class="mt-6 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8">
-            <div class="mx-auto w-full flex-none lg:max-w-2xl xl:max-w-4xl">
-              <div class="space-y-6">
+          <div className="mt-6 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8">
+            <div className="mx-auto w-full flex-none lg:max-w-2xl xl:max-w-4xl">
+              <div className="space-y-6">
                 {cart.map((item) => (
                   <div
                     key={item.productId}
-                    class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 md:p-2"
+                    className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 md:p-2"
                   >
-                    <div class="sm:flex items-center sm:justify-between sm:gap-4">
+                    <div className="sm:flex items-center sm:justify-between sm:gap-4">
                       <div className="basis-2/6 flex items-center justify-center sm:justify-start mb-4">
                         <img
                           src={item.products.image.url}
                           alt={item.products.image.alt}
-                          class="w-32 h-32 rounded-lg"
+                          className="w-32 h-32 rounded-lg"
                         />
                       </div>
                       <div className="sm:text-start basis-1/6 text-center mb-4">
@@ -132,40 +193,40 @@ function CartPage() {
               </div>
             </div>
 
-            <div class="mx-auto mt-6 max-w-4xl flex-1 space-y-6 lg:mt-0 lg:w-full">
-              <div class="space-y-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-6">
-                <p class="text-xl font-semibold text-gray-900 dark:text-white">
+            <div className="mx-auto mt-6 max-w-4xl flex-1 space-y-6 lg:mt-0 lg:w-full">
+              <div className="space-y-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-6">
+                <p className="text-xl font-semibold text-gray-900 dark:text-white">
                   Tổng cộng
                 </p>
 
-                <div class="space-y-4">
-                  <dl class="flex items-center justify-between gap-4 border-t border-gray-200 pt-2 dark:border-gray-700">
-                    <dt class="text-base font-bold text-gray-900 dark:text-white">
+                <div className="space-y-4">
+                  <dl className="flex items-center justify-between gap-4 border-t border-gray-200 pt-2 dark:border-gray-700">
+                    <dt className="text-base font-bold text-gray-900 dark:text-white">
                       Tổng tiền
                     </dt>
-                    <dd class="text-base font-bold text-gray-900 dark:text-white">
+                    <dd className="text-base font-bold text-gray-900 dark:text-white">
                       {formatCurrency(totalPrice)}
                     </dd>
                   </dl>
                 </div>
 
-                <button class="flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 bg-blue-500">
-                  Mua ngay
-                </button>
+                <BuyProductForm
+                  buttonText="Mua hàng"
+                  onPurchase={handlePurchase}
+                />
 
-                <div class="flex items-center justify-center gap-2">
-                  <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
+                <div className="flex items-center justify-center gap-2">
+                  <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
                     {" "}
                     hoặc{" "}
                   </span>
-                  <a
-                    href="/product"
-                    title=""
-                    class="inline-flex items-center gap-2 text-sm font-medium text-primary-700 underline hover:no-underline dark:text-primary-500"
+                  <Link
+                    to="/product"
+                    className="inline-flex items-center gap-2 text-sm font-medium text-blue-700 underline hover:no-underline dark:text-blue-500"
                   >
                     Mua sắm tiếp
                     <svg
-                      class="h-5 w-5"
+                      className="h-5 w-5"
                       aria-hidden="true"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -173,13 +234,13 @@ function CartPage() {
                     >
                       <path
                         stroke="currentColor"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
                         d="M19 12H5m14 0-4 4m4-4-4-4"
                       />
                     </svg>
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>

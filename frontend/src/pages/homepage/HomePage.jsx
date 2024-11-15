@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -17,12 +17,12 @@ export default function HomePage() {
               chất lượng cao để bạn lựa chọn.
             </div>
             <div className="flex justify-center">
-              <a
-                href="/product"
+              <Link
+                to="/product"
                 className="uppercase bg-white text-gray-900 w-max tracking-wider px-6 py-4 text-xs font-semibold rounded hover:bg-opacity-80"
               >
                 Khám phá sản phẩm của cô Tùng
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -43,18 +43,18 @@ export default function HomePage() {
               consequatur ad odit, est totam quod quo recusandae rerum. Rem
               dignissimos rerum neque velit impedit cumque maxime, repudiandae
               veritatis fugit, praesentium itaque! Nulla eveniet eum esse sed
-              porro obcaecati tempore, veniam a labore repellat! Officiis ut
+              porro obcaecati tempore, veniam Link labore repellat! Officiis ut
               laborum omnis aut nostrum, rem mollitia porro odit facere libero
               necessitatibus amet neque ab autem et exercitationem aspernatur
               iure, tenetur itaque!
             </div>
             <div className="">
-              <a
-                href="/"
+              <Link
+                to="/"
                 className="text-coffee-400 hover:text-coffee-600 relative after:absolute after:-bottom-2 after:left-0 after:bg-coffee-50 hover:after:bg-coffee-200 after:h-0.5 after:w-full after:transition-all after:ease-in-out after:duration-400"
               >
                 Đọc tất cả câu chuyện
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -85,12 +85,12 @@ export default function HomePage() {
               nghiệm rất thú vị!
             </div>
             <div className="flex">
-              <a
-                href="/product"
+              <Link
+                to="/product"
                 className="uppercase bg-gray-900 text-white w-max tracking-wider px-6 py-4 text-xs font-semibold rounded hover:bg-opacity-80 mx-auto md:mx-0"
               >
                 Bắt đầu Shoping
-              </a>
+              </Link>
             </div>
           </div>
         </div>

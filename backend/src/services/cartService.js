@@ -39,8 +39,17 @@ const deleteProductInCart = async (userId, productId) => {
   }
 };
 
+const deleteAllProductsInCartByUserId = async (userId) => {
+  try {
+    return await cartModel.deleteAllProductsInCartByUserId(userId);
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 export const cartService = {
   createNewCart,
   getCartByUserId,
   deleteProductInCart,
+  deleteAllProductsInCartByUserId,
 };
