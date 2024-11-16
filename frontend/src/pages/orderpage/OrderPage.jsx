@@ -301,6 +301,7 @@ export default function OrderPage() {
               pageSizeOptions={["5", "10", "15", "20", "50"]}
               onChange={(page) => setCurrentPage(page)}
               onShowSizeChange={handlePageSizeChange}
+              responsive={true}
             />
           </nav>
         </div>

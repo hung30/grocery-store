@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 export default function HomePage() {
   const navigate = useNavigate();
   return (
-    <div className="mb-5">
+    <div className="mb-5 dark:bg-neutral-900">
       <div className="slider h-[530px] bg-[url('./assets/homepage/dau-bg.jpg')] bg-cover bg-no-repeat bg-center rounded-lg overflow-hidden">
         <div className="w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-60">
           <div className="mx-16 text-white text-center">
@@ -27,7 +27,7 @@ export default function HomePage() {
           </div>
         </div>
       </div>
-      <div className="story">
+      <div className="story dark:text-white">
         <div className="w-full h-full flex justify-center items-center">
           <div className="px-4 sm:px-16 md:px-32 lg:px-64 xl:px-96 py-32 text-center">
             <div className="text-3xl mb-6 leading-10">
@@ -75,19 +75,19 @@ export default function HomePage() {
               <div className="h-[130px] xs:h-[200px] md:h-[130px] basis-1/2 bg-[url('./assets/homepage/dau-bg-02.jpg')] bg-cover bg-no-repeat bg-center"></div>
             </div>
           </div>
-          <div className="ct-bean-post basis-1/2 md:pl-8 xl:pl-14 text-center md:text-left">
-            <div className="uppercase tracking-widest text-gray-500 font-medium text-xs mb-4">
+          <div className="ct-bean-post basis-1/2 md:pl-8 xl:pl-14 text-center md:text-left dark:text-white">
+            <div className="uppercase tracking-widest text-gray-500 dark:text-white font-medium text-xs mb-4">
               Ưu đãi đặc biệt
             </div>
             <div className="text-3xl mb-4">Nhận cái bắt tay của Đình Hưng</div>
-            <div className="text-gray-500 leading-7 mb-4">
+            <div className="text-gray-500 dark:text-white leading-7 mb-4">
               Nhận được cái bắt tay của doanh nhân thành đạt, bạn sẽ có trải
               nghiệm rất thú vị!
             </div>
             <div className="flex">
               <Link
                 to="/product"
-                className="uppercase bg-gray-900 text-white w-max tracking-wider px-6 py-4 text-xs font-semibold rounded hover:bg-opacity-80 mx-auto md:mx-0"
+                className="uppercase bg-gray-900 text-white w-max tracking-wider px-6 py-4 text-xs font-semibold rounded hover:bg-opacity-80 mx-auto md:mx-0 dark:bg-blue-600 dark:hover:bg-blue-400"
               >
                 Bắt đầu Shoping
               </Link>
@@ -138,7 +138,7 @@ export default function HomePage() {
       <div>
         <div className="flex justify-center items-center mb-20">
           <div className="ct-subheadline-deco-line"></div>
-          <div className="mx-4 tracking-widest text-gray-500 font-medium text-sm text-center">
+          <div className="mx-4 tracking-widest text-gray-500 dark:text-white font-medium text-sm text-center">
             75A đường 16A thôn 7 xã Hoà Thuận tỉnh Đăk Lăk thành phố Buôn Ma
             Thuột
           </div>

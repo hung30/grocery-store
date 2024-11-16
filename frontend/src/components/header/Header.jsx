@@ -76,7 +76,7 @@ export default function Header() {
   return (
     <header
       ref={ref}
-      className="py-4 text-yellow-100 bg-blue-400 fixed w-full z-[100]"
+      className="py-4 text-yellow-100 bg-blue-400 fixed w-full z-[100] dark:bg-slate-700 dark:text-white"
     >
       <nav className="flex flex-row justify-between items-center">
         <div className="logo basis-2/6 text-center text-xl font-semibold cursor-pointer pl-2">

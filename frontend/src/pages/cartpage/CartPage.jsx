@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { formatCurrency } from "../../utils/formatCurrency";
 import { LoadingContext } from "../../contexts/LoadingContext";
 import authorizedAxiosInstance from "../../utils/authorizedAxios";
 import { env } from "../../config/environment";
 import { message } from "antd";
-import { clearCart, setCart } from "../../redux/cartSlice";
+import { clearCart, removeFromCart } from "../../redux/cartSlice";
 import BuyProductForm from "../../components/buyProductForm/BuyProductForm";
 import { Link } from "react-router-dom";
 
@@ -34,7 +34,7 @@ function CartPage() {
       }
     };
     cartData();
-  }, []);
+  }, [setIsLoading]);
 
   useEffect(() => {
     let total = 0;
@@ -74,8 +74,9 @@ function CartPage() {
       await authorizedAxiosInstance.delete(
         `${env.API_URL}/v1/cart?productId=${productId}`
       );
+      dispatch(removeFromCart(productId));
+      setCart(cart.filter((item) => item.productId !== productId));
       message.success("Xóa sản phẩm thành công!");
-      dispatch(setCart(cart.filter((item) => item.productId !== productId)));
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
@@ -113,9 +114,9 @@ function CartPage() {
         orderItems
       );
       await authorizedAxiosInstance.delete(`${env.API_URL}/v1/cart/${userId}`);
-      dispatch(clearCart);
+      dispatch(clearCart());
+      setCart([]);
       message.success("Đặt hàng thành công!");
-      dispatch(setCart([]));
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
@@ -148,7 +149,7 @@ function CartPage() {
                           className="w-32 h-32 rounded-lg"
                         />
                       </div>
-                      <div className="sm:text-start basis-1/6 text-center mb-4">
+                      <div className="sm:text-start basis-1/6 text-center mb-4 dark:text-white">
                         <strong>{item.products.name}</strong>
                       </div>
                       <div className="basis-3/6 flex justify-center gap-4 text-center">
@@ -163,7 +164,7 @@ function CartPage() {
                             defaultValue={quantities[item.productId] || 1}
                           />
                         </div>
-                        <div className="basis-2/4">
+                        <div className="basis-2/4 dark:text-white">
                           <strong>{formatCurrency(item.products.price)}</strong>
                         </div>
                         <div className="basis-1/4 text-end sm:text-center">
