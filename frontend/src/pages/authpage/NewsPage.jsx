@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import authorizedAxiosInstance from "../../utils/authorizedAxios";
-import { message } from "antd";
 
 function NewsPage() {
   const [news, setNews] = useState("");

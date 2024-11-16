@@ -20,9 +20,9 @@
 }
 
 .ct-subheadline-deco-line {
-  @apply w-8 h-px bg-gray-200;
+  @apply w-8 h-px bg-gray-200 dark:bg-white;
 }
 
 .ct-subheadline-label {
-  @apply uppercase mx-4 tracking-widest text-gray-500 font-medium text-[12px] text-center;
+  @apply uppercase mx-4 tracking-widest text-gray-500 font-medium text-[12px] text-center dark:text-white;
 }

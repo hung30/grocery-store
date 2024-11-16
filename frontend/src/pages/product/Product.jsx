@@ -11,6 +11,7 @@ import { env } from "../../config/environment";
 import { message } from "antd";
 import { addToCart } from "../../redux/cartSlice";
 import BuyProductForm from "../../components/buyProductForm/BuyProductForm";
+import { slugify } from "./../../utils/formatters";
 
 export default function Product() {
   const [products, setProducts] = useState([]);
@@ -18,6 +19,7 @@ export default function Product() {
   const [currentPage, setCurrentPage] = useState(0); // Trang hiện tại bắt đầu từ 0
   const [displayedProducts, setDisplayedProducts] = useState([]);
   const [type, setType] = useState();
+  const [search, setSearch] = useState("");
   const productsPerPage = 6; // Số lượng sản phẩm trên mỗi trang
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -41,7 +43,7 @@ export default function Product() {
       }
     };
     product();
-  }, []);
+  }, [products.length, setIsLoading]);
 
   useEffect(() => {
     if (!products || products.length === 0) return;
@@ -64,6 +66,19 @@ export default function Product() {
       navigate("/product");
     }
   }, [dispatch, navigate]);
+
+  useEffect(() => {
+    const filteredProducts = products.filter((product) =>
+      product.slug.toLowerCase().includes(search.toLowerCase())
+    );
+    setDisplayedProducts(
+      filteredProducts.slice(
+        currentPage * productsPerPage,
+        (currentPage + 1) * productsPerPage
+      )
+    );
+    setTotalPage(Math.ceil(filteredProducts.length / productsPerPage));
+  }, [search, products, currentPage, productsPerPage]);
 
   // Danh sách sản phẩm để hiển thị trên trang hiện tại
 
@@ -122,17 +137,26 @@ export default function Product() {
     }
   };
 
+  const handleSearchChange = (e) => {
+    const searchToSlug = e.target.value;
+
+    setSearch(slugify(searchToSlug));
+    console.log(search);
+  };
+
   return (
-    <div className="flex flex-col items-center w-full gap-4 mx-auto xl:px-24">
-      <div className="text-3xl font-medium p-4 uppercase">Sản phẩm</div>
-      <div className="flex flex-col md:flex-row w-full">
+    <div className="flex flex-col items-center w-full gap-4 mx-auto xl:px-24 dark:bg-neutral-900">
+      <div className="text-3xl font-medium p-4 uppercase dark:text-white">
+        Sản phẩm
+      </div>
+      <div className="flex flex-col md:flex-row w-full dark:text-white">
         <div className="basis-1/4 text-center flex flex-col md:block mb-4 md:mb-0">
           <div className="uppercase text-xl mb-4 md:mb-8">Danh mục</div>
           <ul className="flex flex-wrap gap-2 justify-center items-center md:block">
             <li>
               <button
                 className={`border-[1px] border-gray-300 rounded-xl px-4 mb-2 hover:border-gray-500 ${
-                  !type ? "border-gray-950" : ""
+                  !type ? "border-gray-950 dark:border-red-600" : ""
                 }`}
                 onClick={handleTypeProductChange()}
               >
@@ -144,7 +168,7 @@ export default function Product() {
                 <li key={index}>
                   <button
                     className={`border-[1px] border-gray-300 rounded-xl px-4 mb-2 hover:border-gray-500 ${
-                      type === item ? "border-gray-950" : ""
+                      type === item ? "border-gray-950 dark:border-red-600" : ""
                     }`}
                     onClick={handleTypeProductChange(item)}
                   >
@@ -161,11 +185,12 @@ export default function Product() {
               <input
                 type="text"
                 placeholder="Tìm kiếm..."
-                className="px-4 py-2 w-[350px] bg-inherit border-[1px] border-gray-700 outline-none leading-5 hover:border-gray-300 duration-500 focus:border-gray-300 placeholder:uppercase placeholder:text-xs placeholder:tracking-widest placeholder:font-semibold"
+                className="px-4 py-2 w-[350px] bg-inherit border-[1px] border-gray-700   dark:border-white outline-none leading-5 hover:border-gray-300 duration-500 focus:border-gray-300 placeholder:uppercase placeholder:text-xs placeholder:tracking-widest placeholder:font-semibold"
+                onChange={handleSearchChange}
               />
             </div>
             <div className="ct-form-item text-center">
-              <button className="uppercase bg-blue-400 text-yellow-100 tracking-wider px-2 py-2 text-xs font-semibold rounded hover:bg-opacity-80 h-[37.6px] w-max">
+              <button className="uppercase bg-blue-400 dark:bg-blue-600 text-yellow-100 dark:text-white tracking-wider px-2 py-2 text-xs font-semibold rounded hover:bg-opacity-80 h-[37.6px] w-max">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -195,7 +220,7 @@ export default function Product() {
             {displayedProducts.map((item) => (
               <div
                 key={item._id}
-                className="ct-card-item w-[180px] sm:w-[200px] lg:w-[242px] flex flex-col justify-center items-center border-[1px] border-gray-700 p-4"
+                className="ct-card-item w-[180px] sm:w-[200px] lg:w-[242px] flex flex-col justify-center items-center border-[1px] border-gray-700 p-4 dark:border-white"
               >
                 <a href={`/product-detail/${item._id}`}>
                   <img
@@ -214,7 +239,7 @@ export default function Product() {
                 <div className="ct-form-item mt-3 text-center flex gap-2 w-full">
                   <button
                     onClick={handleCart(item._id)}
-                    className="uppercase bg-blue-400 text-yellow-100 tracking-wider text-xs font-semibold rounded hover:bg-opacity-80 p-2 w-4/5 lg:w-full basis-1/3"
+                    className="uppercase bg-blue-400 text-yellow-100 tracking-wider text-xs font-semibold rounded hover:bg-opacity-80 p-2 w-4/5 lg:w-full basis-1/3 dark:bg-blue-600 dark:text-white"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -232,7 +257,7 @@ export default function Product() {
                     </svg>
                   </button>
                   <BuyProductForm
-                    classButtonName="basis-2/3 bg-blue-400 uppercase text-yellow-100 tracking-wider text-xs font-semibold rounded hover:bg-opacity-80"
+                    classButtonName="basis-2/3 bg-blue-400 uppercase text-yellow-100 tracking-wider text-xs font-semibold rounded hover:bg-opacity-80 dark:bg-blue-600 dark:text-white"
                     buttonText="Mua ngay"
                     onPurchase={handlePurchase}
                     countInStock={item.countInStock}
@@ -250,20 +275,20 @@ export default function Product() {
             previousLabel="Trước"
             nextLabel="Tiếp"
             pageClassName="page-item"
-            pageLinkClassName="page-link"
+            pageLinkClassName="page-link text-gray-900 dark:text-white"
             previousClassName="page-item"
-            previousLinkClassName="page-link"
+            previousLinkClassName="page-link bg-gray-200 hover:bg-blue-500 text-gray-900 dark:bg-gray-700 dark:hover:bg-blue-600 dark:text-white rounded"
             nextClassName="page-item"
-            nextLinkClassName="page-link"
+            nextLinkClassName="page-link bg-gray-200 hover:bg-blue-500 text-gray-900 dark:bg-gray-700 dark:hover:bg-blue-600 dark:text-white rounded"
             breakLabel="..."
             breakClassName="page-item"
-            breakLinkClassName="page-link"
+            breakLinkClassName="page-link text-gray-900 dark:text-white"
             pageCount={totalPage}
             marginPagesDisplayed={2}
             pageRangeDisplayed={5}
             onPageChange={handlePageChange}
-            containerClassName="pagination"
-            activeClassName="active"
+            containerClassName="pagination flex justify-center gap-2 mt-5"
+            activeClassName="active text-white"
             forcePage={currentPage}
           />
         </div>
