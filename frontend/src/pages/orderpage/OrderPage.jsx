@@ -9,6 +9,12 @@ import OrderStatus from "../../components/orderStatus/OrderStatus";
 import { message, Pagination } from "antd";
 import moment from "moment";
 
+moment.updateLocale("en", {
+  week: {
+    dow: 1, // Monday is the first day of the week.
+  },
+});
+
 export default function OrderPage() {
   const [orders, setOrders] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -20,10 +26,11 @@ export default function OrderPage() {
 
   useEffect(() => {
     const order = async () => {
+      const userId = JSON.parse(localStorage.getItem("userInfo"))._id;
       try {
         setIsLoading(true);
         const res = await authorizedAxiosInstance.get(
-          `${env.API_URL}/v1/orders`
+          `${env.API_URL}/v1/orders/${userId}`
         );
         setOrders(res.data.orders);
         setTotalOrders(res.data.totalOrders);
@@ -288,7 +295,7 @@ export default function OrderPage() {
                   </div>
                 ))
               ) : (
-                <div>Không có đơn hàng nào</div>
+                <div className="dark:text-white">Không có đơn hàng nào</div>
               )}
             </div>
           </div>

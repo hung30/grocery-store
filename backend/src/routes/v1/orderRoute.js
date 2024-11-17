@@ -10,9 +10,10 @@ Router.route("/admin/").get(
 );
 
 Router.route("/:orderId")
-  .get(authMiddleware.isAuthorized, orderController.getOneById)
   .put(authMiddleware.isAuthorized, orderController.updateOrderStatusById)
   .delete(authMiddleware.isAuthorized, orderController.deleteOrderById);
+
+Router.route("/:userId").get(orderController.getOrdersByUserId);
 
 Router.route("/")
   .post(authMiddleware.isAuthorized, orderController.createNewOrder)

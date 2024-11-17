@@ -131,7 +131,9 @@ function CartPage() {
           Giỏ hàng của bạn
         </h2>
         {cart?.length === 0 ? (
-          <div>Chưa có sản phẩm nào trong giỏ hàng</div>
+          <div className="dark:text-white">
+            Chưa có sản phẩm nào trong giỏ hàng
+          </div>
         ) : (
           <div className="mt-6 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8">
             <div className="mx-auto w-full flex-none lg:max-w-2xl xl:max-w-4xl">
