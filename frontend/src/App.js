@@ -22,6 +22,11 @@ import { useContext, useEffect, useState } from "react";
 import Spinner from "./components/spinner/Spinner";
 import OrderPage from "./pages/orderpage/OrderPage";
 import { ConfigProvider } from "antd";
+import ContactPage from "./pages/authpage/ContactPage";
+import ProductDetailPage from "./pages/productDetail/ProductDetailPage";
+import UserPage from "./pages/authpage/UserPage";
+import ChangePasswordPage from "./pages/authpage/ChangePasswordPage";
+import PasswordEmptyModal from "./components/passwordEmptyModal/PasswordEmptyModal";
 
 const ProtectedRoutes = () => {
   const user = JSON.parse(localStorage.getItem("userInfo"));
@@ -81,6 +86,7 @@ function Layout() {
           Input: {
             colorText: darkMode && "#333",
             colorBgContainer: darkMode && "#F3F4F6",
+            colorTextPlaceholder: darkMode && "#6B7280",
           },
         },
       }}
@@ -142,11 +148,17 @@ function App() {
   return (
     <LoadingProvider>
       <BrowserRouter>
+        <PasswordEmptyModal />
         <Routes>
           <Route element={<Layout />}>
             <Route index element={<HomePage />} />
             <Route path="/product" element={<Product />} />
             <Route path="/news" element={<NewsPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route
+              path="/product-detail/:productId"
+              element={<ProductDetailPage />}
+            />
 
             <Route element={<UnauthorizedRoutes />}>
               <Route path="/login" element={<LoginPage />} />
@@ -157,6 +169,11 @@ function App() {
             <Route element={<ProtectedRoutes />}>
               <Route path="/cart" element={<CartPage />} />
               <Route path="/order" element={<OrderPage />} />
+              <Route path="/user" element={<UserPage />} />
+              <Route
+                path="/user/change-password"
+                element={<ChangePasswordPage />}
+              />
             </Route>
 
             <Route path="/admin" element={<AdminLayout />}>

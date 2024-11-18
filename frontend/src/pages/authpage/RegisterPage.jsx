@@ -77,7 +77,7 @@ export default function RegisterPage() {
         <div className="text-2xl text-blue-500 font-medium text-center uppercase">
           Đăng ký
         </div>
-        <div className="text-gray-500 mb-10 text-center">
+        <div className="text-gray-500 mb-10 text-center dark:text-white">
           Tạo tài khoản mới của bạn
         </div>
         <form onSubmit={formik.handleSubmit} autoComplete="off">
@@ -132,7 +132,7 @@ export default function RegisterPage() {
             Đăng ký
           </button>
         </form>
-        <div className="text-center p-3">
+        <div className="text-center p-3 dark:text-white">
           Đã có tài khoản?,{" "}
           <span className="text-blue-500">
             <Link to="/login">Đăng nhập</Link>

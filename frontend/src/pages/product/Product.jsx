@@ -26,6 +26,7 @@ export default function Product() {
   const { setIsLoading } = useContext(LoadingContext);
   const user = JSON.parse(localStorage.getItem("userInfo"));
 
+  console.log(user);
   useEffect(() => {
     const product = async () => {
       try {

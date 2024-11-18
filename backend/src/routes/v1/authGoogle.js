@@ -23,7 +23,17 @@ router.get(
   }),
   async (req, res) => {
     // Đăng nhập thành công, chuyển hướng về trang chủ
-    const { password, ...userInfo } = req.user;
+    const isPasswordEmpty = req.user.password === "" ? true : false;
+    const userInfo = {
+      _id: req.user._id,
+      email: req.user.email,
+      name: req.user.name,
+      telephone: req.user.telephone,
+      address: req.user.address,
+      isAdmin: req.user.isAdmin,
+      isPasswordEmpty: isPasswordEmpty,
+    };
+
     const accessToken = await JwtProvider.generateToken(
       userInfo,
       env.ACCESS_TOKEN_PRIVATE_KEY,

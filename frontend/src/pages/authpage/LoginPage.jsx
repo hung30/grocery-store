@@ -41,7 +41,7 @@ export default function LoginPage() {
         <div className="text-2xl text-blue-500 font-medium text-center uppercase">
           Chào mừng trở lại
         </div>
-        <div className="text-gray-500 mb-10 text-center">
+        <div className="text-gray-500 mb-10 text-center dark:text-white">
           Đăng nhập vào tài khoản của bạn
         </div>
         <div className="flex flex-col mb-4 gap-4">
@@ -65,7 +65,7 @@ export default function LoginPage() {
         >
           Đăng nhập
         </button>
-        <div className="text-center p-3 mb-4">
+        <div className="text-center p-3 mb-4 dark:text-white">
           Không có tài khoản?,{" "}
           <span className="text-blue-500">
             <a href="/register">Đăng ký</a>
@@ -77,13 +77,15 @@ export default function LoginPage() {
           <div className="ct-subheadline-deco-line"></div>
         </div>
         <div className="text-gray-500">
-          <div className="text-center text-xl  mb-2">Đăng nhập với: </div>
+          <div className="text-center text-xl mb-2 dark:text-white">
+            Đăng nhập với:{" "}
+          </div>
           <a
             href={`${env.API_URL}/v1/auth-google/google`}
             className="flex flex-row justify-center items-center gap-2"
           >
             <img src={googleLogo} width={40} height={40} alt="google" />
-            <div className="text-lg">Google</div>
+            <div className="text-lg dark:text-white">Google</div>
           </a>
         </div>
       </div>

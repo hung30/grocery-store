@@ -126,16 +126,16 @@ export default function ForgotPasswordPage() {
   });
 
   return (
-    <div className="flex flex-col items-center justify-center bg-gray-100">
+    <div className="flex flex-col items-center justify-center bg-gray-100 dark:bg-neutral-900">
       {step === 1 && (
         <form
           onSubmit={handleEmailSubmit}
-          className="bg-white p-6 rounded shadow-md w-80"
+          className="bg-white p-6 rounded shadow-md w-80 dark:bg-neutral-900 dark:shadow-none"
         >
           <div className="text-2xl text-blue-500 font-medium text-center uppercase">
             Quên mật khẩu
           </div>
-          <div className="text-gray-500 mb-10 text-center">
+          <div className="text-gray-500 mb-10 text-center dark:text-white">
             Nhập email để nhận mã OTP
           </div>
 
@@ -144,7 +144,7 @@ export default function ForgotPasswordPage() {
             placeholder="Email"
             setData={(e) => setEmail(e.target.value)}
           />
-          <div className="text-end mb-10 mt-1">
+          <div className="text-end mb-10 mt-1 dark:text-white">
             <div>
               Đã nhớ mật khẩu?{" "}
               <span>
@@ -165,12 +165,12 @@ export default function ForgotPasswordPage() {
       {step === 2 && (
         <form
           onSubmit={handleOtpSubmit}
-          className="bg-white p-6 rounded shadow-md w-80"
+          className="bg-white p-6 rounded shadow-md w-80 dark:bg-neutral-900 dark:shadow-none"
         >
           <div className="text-2xl text-blue-500 font-medium text-center uppercase">
             Nhập OTP
           </div>
-          <div className="text-gray-500 mb-10 text-center">
+          <div className="text-gray-500 mb-10 text-center dark:text-white">
             Nhập mã OTP đã được gửi đến email của bạn
           </div>
 
@@ -186,7 +186,7 @@ export default function ForgotPasswordPage() {
           >
             Xác thực OTP
           </button>
-          <div className="mt-4 text-center text-gray-500">
+          <div className="mt-4 text-center text-gray-500 dark:text-white">
             {isResendDisabled ? (
               <span>Không nhận được OTP? Gửi lại trong {countdown}s</span>
             ) : (
@@ -204,12 +204,12 @@ export default function ForgotPasswordPage() {
       {step === 3 && (
         <form
           onSubmit={formik.handleSubmit}
-          className="bg-white p-6 rounded shadow-md w-80"
+          className="bg-white p-6 rounded shadow-md w-80 dark:bg-neutral-900 dark:shadow-none"
         >
           <div className="text-2xl text-blue-500 font-medium text-center uppercase">
             Thay đổi mật khẩu
           </div>
-          <div className="text-gray-500 mb-10 text-center">
+          <div className="text-gray-500 mb-10 text-center  dark:text-white">
             Đổi lại mật khẩu mới cho bạn
           </div>
           <div className="flex flex-col mb-14 gap-4">
@@ -225,7 +225,7 @@ export default function ForgotPasswordPage() {
               type="password"
               id="confirmPassword"
               name="confirmPassword"
-              placeholder="Nhập lai mật khẩu"
+              placeholder="Nhập lại mật khẩu"
               setData={formik.handleChange}
               error={
                 formik.touched.confirmPassword && formik.errors.confirmPassword

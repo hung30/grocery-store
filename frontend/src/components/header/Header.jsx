@@ -219,16 +219,13 @@ export default function Header() {
               {isToggleUser && (
                 <ul className="absolute z-50 top-6 right-0 bg-white text-black text-sm p-2 whitespace-nowrap rounded-sm animate-sliceDown">
                   <li className="border-b border-gray-300 pb-1">
-                    <Link to="/">Cá nhân</Link>
+                    <Link to="/user">Cá nhân</Link>
                   </li>
                   {!user?.isAdmin && (
                     <li className="border-b border-gray-300 py-1">
                       <Link to="/order">Đơn đặt</Link>
                     </li>
                   )}
-                  {/* <li className="border-b border-gray-300 py-1">
-                    <Link to="/setting">Cài đặt</Link>
-                  </li> */}
                   <li className="py-1">
                     <button onClick={handleLogout}>Đăng xuất</button>
                   </li>
@@ -280,11 +277,7 @@ export default function Header() {
               </li>
               {!user?.isAdmin && (
                 <li className="border-b border-gray-300 py-1">
-                  <Link to="/user">
-                    {user?.name.length <= 7
-                      ? user.name
-                      : user.name.slice(user.name.lastIndexOf(" ") + 1)}
-                  </Link>
+                  <Link to="/user">Cá nhân</Link>
                 </li>
               )}
               {!user?.isAdmin && (
