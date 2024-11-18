@@ -11,6 +11,7 @@ export default function Input(props) {
     placeholder,
     error,
     autoComplete = "on",
+    value = "",
   } = props;
   const [inputType, setInputType] = useState(type);
   const [icon, setIcon] = useState(type === "password" ? <EyeIcon /> : null);
@@ -27,17 +28,32 @@ export default function Input(props) {
   return (
     <div>
       <div className="relative">
-        <input
-          type={inputType}
-          id={id}
-          name={name}
-          placeholder={placeholder}
-          onChange={setData}
-          autoComplete={autoComplete}
-          className={`p-2 bg-slate-200 border-[1px] rounded outline-none hover:border-gray-500 focus:border-gray-500 placeholder:text-gray-500 pr-10 w-full duration-500 ${
-            error ? "border-red-500" : ""
-          }`}
-        />
+        {value ? (
+          <input
+            type={inputType}
+            id={id}
+            name={name}
+            placeholder={placeholder}
+            onChange={setData}
+            autoComplete={autoComplete}
+            value={value}
+            className={`p-2 bg-slate-200 border-[1px] rounded outline-none hover:border-gray-500 focus:border-gray-500 placeholder:text-gray-500 pr-10 w-full duration-500 ${
+              error ? "border-red-500" : ""
+            }`}
+          />
+        ) : (
+          <input
+            type={inputType}
+            id={id}
+            name={name}
+            placeholder={placeholder}
+            onChange={setData}
+            autoComplete={autoComplete}
+            className={`p-2 bg-slate-200 border-[1px] rounded outline-none hover:border-gray-500 focus:border-gray-500 placeholder:text-gray-500 pr-10 w-full duration-500 ${
+              error ? "border-red-500" : ""
+            }`}
+          />
+        )}
         {type === "password" && (
           <span
             onClick={togglePasswordVisibility}

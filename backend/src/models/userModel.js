@@ -105,6 +105,16 @@ const updatePasswordById = async (id, password) => {
   }
 };
 
+const findUserByPhone = async (userId, phone) => {
+  try {
+    return await GET_DB()
+      .collection(USER_COLLECTION_NAME)
+      .findOne({ telephone: phone, _id: { $ne: new ObjectId(userId) } });
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 export const userModel = {
   USER_COLLECTION_NAME,
   USER_SCHEMA,
@@ -115,4 +125,5 @@ export const userModel = {
   findOneByEmail,
   findOneByEmailOrPhone,
   updatePasswordById,
+  findUserByPhone,
 };

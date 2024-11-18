@@ -5,6 +5,10 @@ import ApiError from "~/utils/ApiError";
 
 const isVerifiedOtp = async (req, res, next) => {
   try {
+    if (req.body.userId) {
+      req.userId = req.body.userId;
+      return next();
+    }
     const token = req.headers["authorization"];
     if (!token) {
       throw new ApiError(StatusCodes.BAD_REQUEST, "Chưa xác thực otp");

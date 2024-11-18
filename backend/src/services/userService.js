@@ -2,8 +2,8 @@ import { Bcrypt } from "~/utils/bcrypt";
 import { userModel } from "~/models/userModel";
 import { JwtProvider } from "~/providers/JwtProvider";
 import { env } from "~/config/environment";
-// import { StatusCodes } from "http-status-codes";
-// import ApiError from "~/utils/ApiError";
+import { StatusCodes } from "http-status-codes";
+import ApiError from "~/utils/ApiError";
 const createNew = async (reqBody) => {
   try {
     const newUser = {
@@ -38,6 +38,11 @@ const getOneUserById = async (id) => {
 
 const updateUserById = async (id, data) => {
   try {
+    const user = await userModel.findUserByPhone(id, data.telephone);
+    if (user) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, "Số điện thoại đã tồn tại");
+    }
+
     const updatedUser = await userModel.updateUserById(id, data);
     if (updatedUser) {
       const { password, ...result } = updatedUser;
@@ -70,7 +75,17 @@ const login = async (reqBody) => {
     if (!comparePassword) {
       return false;
     }
-    const { password, ...userInfo } = user;
+
+    const isPasswordEmpty = user.password === "" ? true : false;
+    const userInfo = {
+      _id: user._id,
+      email: user.email,
+      name: user.name,
+      telephone: user.telephone,
+      address: user.address,
+      isAdmin: user.isAdmin,
+      isPasswordEmpty: isPasswordEmpty,
+    };
 
     const accessToken = await JwtProvider.generateToken(
       userInfo,
