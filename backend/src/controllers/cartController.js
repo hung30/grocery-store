@@ -22,7 +22,7 @@ const createNewCart = async (req, res, next) => {
 
 const getCartByUserId = async (req, res, next) => {
   try {
-    const userId = req.params.userId;
+    const userId = req.jwtDecoded._id;
     const cart = await cartService.getCartByUserId(userId);
     return res.status(StatusCodes.OK).json(cart);
   } catch (error) {

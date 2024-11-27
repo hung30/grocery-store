@@ -59,9 +59,7 @@ export default function Header() {
   useEffect(() => {
     const cart = async () => {
       try {
-        const res = await authorizedAxiosInstance.get(
-          `${env.API_URL}/v1/cart/${user._id}`
-        );
+        const res = await authorizedAxiosInstance.get(`${env.API_URL}/v1/cart`);
         dispatch(setCart(res.data));
       } catch (error) {
         console.log(error);

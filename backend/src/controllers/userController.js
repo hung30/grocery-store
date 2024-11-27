@@ -144,6 +144,7 @@ const refreshToken = async (req, res, next) => {
       sameSite: "none",
       maxAge: ms("14 days"),
     });
+
     res
       .status(StatusCodes.OK)
       .json({ message: "Làm mới token thành công", accessToken });
@@ -166,6 +167,15 @@ const resetPasswordById = async (req, res, next) => {
   }
 };
 
+const getAllUsers = async (req, res, next) => {
+  try {
+    const users = await userService.getAllUsers();
+    return res.status(StatusCodes.OK).json(users);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const userController = {
   createNew,
   getOneUserById,
@@ -175,4 +185,5 @@ export const userController = {
   logout,
   refreshToken,
   resetPasswordById,
+  getAllUsers,
 };

@@ -20,7 +20,7 @@ const createNewOrder = async (req, res, next) => {
 
 const getOrdersByUserId = async (req, res, next) => {
   try {
-    const userId = req.params.userId;
+    const userId = req.jwtDecoded._id;
     const orders = await orderService.getOrdersByUserId(userId);
     if (!orders) {
       throw new ApiError(StatusCodes.NOT_FOUND, "Không tìm thấy đơn hàng");

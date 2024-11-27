@@ -1,10 +1,11 @@
-import { Modal } from "antd";
+import { Button, Modal } from "antd";
 import React, { useState } from "react";
 import { formatDate } from "../../utils/formatDate";
 import { formatCurrency } from "../../utils/formatCurrency";
+import { SearchOutlined } from "@ant-design/icons";
 
 export default function ViewOrderDetail(props) {
-  const { order } = props;
+  const { order, isAdminOrder = false } = props;
   const [isModalVisible, setIsModalVisible] = useState(false);
   const handleOk = () => {
     setIsModalVisible(false);
@@ -19,12 +20,20 @@ export default function ViewOrderDetail(props) {
   };
   return (
     <div>
-      <button
-        className="w-full inline-flex justify-center rounded-lg  border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700 lg:w-auto"
-        onClick={showModal}
-      >
-        Xem chi tiết
-      </button>
+      {isAdminOrder ? (
+        <Button
+          type="dashed"
+          icon={<SearchOutlined />}
+          onClick={showModal}
+        ></Button>
+      ) : (
+        <button
+          className="w-full inline-flex justify-center rounded-lg  border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700 lg:w-auto"
+          onClick={showModal}
+        >
+          Xem chi tiết
+        </button>
+      )}
       <Modal
         title={<span className="text-xl font-semibold">Chi tiết đơn hàng</span>}
         open={isModalVisible}
@@ -51,7 +60,7 @@ export default function ViewOrderDetail(props) {
             <strong>Tổng giá:</strong> {formatCurrency(order?.totalPrice)}
           </p>
           <p className="mb-4">
-            <strong>Trạng thái:</strong> {order?.statusInfo?.statusName}
+            <strong>Trạng thái:</strong> {order?.statusInfo[0]?.statusName}
           </p>
           <h3 className="text-lg font-semibold mb-2">Danh sách món hàng:</h3>
           <ul className="list-disc pl-5">

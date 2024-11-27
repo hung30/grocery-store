@@ -18,8 +18,8 @@ export const slugify = (string) => {
     .replace(/\s+/g, "-")
     .replace(p, (c) => b.charAt(a.indexOf(c)))
     .replace(/&/g, "-and-")
-    .replace(/[^\w\-]+/g, "")
-    .replace(/\-\-+/g, "-")
+    .replace(/[^\w-]+/g, "")
+    .replace(/--+/g, "-")
     .replace(/^-+/, "")
     .replace(/-+$/, "");
 };

@@ -26,7 +26,6 @@ export default function Product() {
   const { setIsLoading } = useContext(LoadingContext);
   const user = JSON.parse(localStorage.getItem("userInfo"));
 
-  console.log(user);
   useEffect(() => {
     const product = async () => {
       try {
@@ -142,7 +141,6 @@ export default function Product() {
     const searchToSlug = e.target.value;
 
     setSearch(slugify(searchToSlug));
-    console.log(search);
   };
 
   return (
@@ -235,7 +233,8 @@ export default function Product() {
                   Giá: {item.price} <sup>đ/kg</sup>
                 </div>
                 <div className="text-base mt-2">
-                  Số lượng: {item.countInStock} <sup>kg</sup>
+                  Số lượng: {parseFloat(item.countInStock).toFixed(2)}{" "}
+                  <sup>kg</sup>
                 </div>
                 <div className="ct-form-item mt-3 text-center flex gap-2 w-full">
                   <button

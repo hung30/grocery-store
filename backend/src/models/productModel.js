@@ -94,6 +94,7 @@ const getAllProducts = async () => {
             createAt: 1,
             updatedAt: 1,
             "type.name": 1,
+            "type._id": 1,
           },
         },
       ])

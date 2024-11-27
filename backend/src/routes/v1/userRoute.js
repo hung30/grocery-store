@@ -2,6 +2,7 @@ import express from "express";
 import { userValidation } from "~/validations/userValidation";
 import { userController } from "~/controllers/userController";
 import { otpMiddleware } from "~/middlewares/otpMiddleware";
+import { authMiddleware } from "~/middlewares/authMiddleware";
 
 const Router = express.Router();
 
@@ -14,10 +15,16 @@ Router.route("/reset-password").put(
 Router.route("/refresh-token").put(userController.refreshToken);
 
 Router.route("/:id")
-  .get(userController.getOneUserById)
-  .put(userValidation.updatedById, userController.updateUserById)
-  .delete(userController.deleteUserById);
+  .get(authMiddleware.isAuthorized, userController.getOneUserById)
+  .put(
+    authMiddleware.isAuthorized,
+    userValidation.updatedById,
+    userController.updateUserById
+  )
+  .delete(authMiddleware.isAuthorized, userController.deleteUserById);
 
-Router.route("/").post(userValidation.createNew, userController.createNew);
+Router.route("/")
+  .get(authMiddleware.isAuthorized, userController.getAllUsers)
+  .post(userValidation.createNew, userController.createNew);
 
 export const userRoute = Router;
