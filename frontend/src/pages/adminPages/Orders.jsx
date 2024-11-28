@@ -5,6 +5,7 @@ import { env } from "../../config/environment";
 import { formatDate } from "./../../utils/formatDate";
 import ViewOrderDetail from "../../components/viewOrderDetail/ViewOrderDetail";
 import UpdateStatusForm from "../../components/buttonActionForUpdateOrderForm/UpdateStatusForm";
+import { formatCurrency } from "../../utils/formatCurrency";
 
 function Orders() {
   const [loading, setLoading] = useState(false);
@@ -47,6 +48,7 @@ function Orders() {
             {
               title: "Tổng tiền",
               dataIndex: "totalPrice",
+              render: (totalPrice) => formatCurrency(totalPrice),
             },
             {
               title: "Trạng thái",

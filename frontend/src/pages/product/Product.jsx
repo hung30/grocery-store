@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 // import { Products } from "./data";
 import ReactPaginate from "react-paginate";
 import "./Product.css";
@@ -25,6 +25,7 @@ export default function Product() {
   const dispatch = useDispatch();
   const { setIsLoading } = useContext(LoadingContext);
   const user = JSON.parse(localStorage.getItem("userInfo"));
+  const timeoutIdRef = useRef(null);
 
   useEffect(() => {
     const product = async () => {
@@ -139,8 +140,12 @@ export default function Product() {
 
   const handleSearchChange = (e) => {
     const searchToSlug = e.target.value;
+    clearTimeout(timeoutIdRef.current);
+    timeoutIdRef.current = setTimeout(() => {
+      setSearch(slugify(searchToSlug));
+    }, 300);
 
-    setSearch(slugify(searchToSlug));
+    // setSearch(slugify(searchToSlug));
   };
 
   return (
@@ -187,6 +192,35 @@ export default function Product() {
                 className="px-4 py-2 w-[350px] bg-inherit border-[1px] border-gray-700   dark:border-white outline-none leading-5 hover:border-gray-300 duration-500 focus:border-gray-300 placeholder:uppercase placeholder:text-xs placeholder:tracking-widest placeholder:font-semibold"
                 onChange={handleSearchChange}
               />
+              <ul
+                className={`absolute bg-white w-[350px] mt-1 max-h-60 overflow-y-auto z-10 ${
+                  search && "border border-gray-300"
+                }`}
+              >
+                {search &&
+                  products
+                    .filter((product) =>
+                      product.slug.toLowerCase().includes(search.toLowerCase())
+                    )
+                    .map((product) => (
+                      <li
+                        key={product._id}
+                        className="px-4 py-2 cursor-pointer hover:bg-gray-200"
+                        onClick={() =>
+                          navigate(`/product-detail/${product._id}`)
+                        }
+                      >
+                        <div className="flex items-center gap-2">
+                          <img
+                            src={product.image.url}
+                            alt={product.name}
+                            className="w-10 h-10"
+                          />
+                          <span>{product.name}</span>
+                        </div>
+                      </li>
+                    ))}
+              </ul>
             </div>
             <div className="ct-form-item text-center">
               <button className="uppercase bg-blue-400 dark:bg-blue-600 text-yellow-100 dark:text-white tracking-wider px-2 py-2 text-xs font-semibold rounded hover:bg-opacity-80 h-[37.6px] w-max">
