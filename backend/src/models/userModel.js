@@ -115,6 +115,14 @@ const findUserByPhone = async (userId, phone) => {
   }
 };
 
+const getAllUsers = async () => {
+  try {
+    return await GET_DB().collection(USER_COLLECTION_NAME).find().toArray();
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 export const userModel = {
   USER_COLLECTION_NAME,
   USER_SCHEMA,
@@ -126,4 +134,5 @@ export const userModel = {
   findOneByEmailOrPhone,
   updatePasswordById,
   findUserByPhone,
+  getAllUsers,
 };

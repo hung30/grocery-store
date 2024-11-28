@@ -118,6 +118,14 @@ const resetPasswordById = async (id, reqBody) => {
   }
 };
 
+const getAllUsers = async () => {
+  try {
+    return await userModel.getAllUsers();
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const userService = {
   createNew,
   getOneUserById,
@@ -125,4 +133,5 @@ export const userService = {
   deleteUserById,
   login,
   resetPasswordById,
+  getAllUsers,
 };

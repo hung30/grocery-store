@@ -17,6 +17,8 @@ authorizedAxiosInstance.defaults.withCredentials = true;
 authorizedAxiosInstance.interceptors.request.use(
   (config) => {
     // Do something before request is sent
+    config.headers["Cache-Control"] = "no-store";
+    config.headers["Pragma"] = "no-cache";
     return config;
   },
   (error) => {

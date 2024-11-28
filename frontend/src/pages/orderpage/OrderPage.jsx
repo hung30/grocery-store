@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
-import { formatCurrency } from "./../../utils/formatCurrency";
+import { formatCurrency } from "../../utils/formatCurrency";
 import ViewOrderDetail from "../../components/viewOrderDetail/ViewOrderDetail";
 import { LoadingContext } from "../../contexts/LoadingContext";
 import authorizedAxiosInstance from "../../utils/authorizedAxios";
@@ -26,11 +26,10 @@ export default function OrderPage() {
 
   useEffect(() => {
     const order = async () => {
-      const userId = JSON.parse(localStorage.getItem("userInfo"))._id;
       try {
         setIsLoading(true);
         const res = await authorizedAxiosInstance.get(
-          `${env.API_URL}/v1/orders/${userId}`
+          `${env.API_URL}/v1/orders`
         );
         setOrders(res.data.orders);
         setTotalOrders(res.data.totalOrders);

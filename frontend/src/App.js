@@ -27,6 +27,10 @@ import ProductDetailPage from "./pages/productDetail/ProductDetailPage";
 import UserPage from "./pages/authpage/UserPage";
 import ChangePasswordPage from "./pages/authpage/ChangePasswordPage";
 import PasswordEmptyModal from "./components/passwordEmptyModal/PasswordEmptyModal";
+import DashBoard from "./pages/adminPages/Dashboard";
+import Customers from "./pages/adminPages/Customers";
+import Inventory from "./pages/adminPages/Inventory";
+import Orders from "./pages/adminPages/Orders";
 
 const ProtectedRoutes = () => {
   const user = JSON.parse(localStorage.getItem("userInfo"));
@@ -43,6 +47,14 @@ const UnauthorizedRoutes = () => {
     return <Navigate to="/" replace={true} />;
   }
   return <Outlet />;
+};
+
+const AdminRoutes = () => {
+  const user = JSON.parse(localStorage.getItem("userInfo"));
+  if (user && user.isAdmin === "true") {
+    return <AdminLayout />;
+  }
+  return <Navigate to="/" replace={true} />;
 };
 
 const LoadingSpin = () => {
@@ -175,11 +187,12 @@ function App() {
                 element={<ChangePasswordPage />}
               />
             </Route>
-
-            <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<HomePage />} />
-              <Route path="product" element={<Product />} />
-            </Route>
+          </Route>
+          <Route path="/admin" element={<AdminRoutes />}>
+            <Route index element={<DashBoard />} />
+            <Route path="customers" element={<Customers />} />
+            <Route path="inventory" element={<Inventory />} />
+            <Route path="orders" element={<Orders />} />
           </Route>
         </Routes>
       </BrowserRouter>

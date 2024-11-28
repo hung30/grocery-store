@@ -19,12 +19,9 @@ function CartPage() {
 
   useEffect(() => {
     const cartData = async () => {
-      const userId = JSON.parse(localStorage.getItem("userInfo"))._id;
       try {
         setIsLoading(true);
-        const res = await authorizedAxiosInstance.get(
-          `${env.API_URL}/v1/cart/${userId}`
-        );
+        const res = await authorizedAxiosInstance.get(`${env.API_URL}/v1/cart`);
         setCart(res.data);
         setIsLoading(false);
         return res.data;

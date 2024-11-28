@@ -4,13 +4,12 @@ import { authMiddleware } from "~/middlewares/authMiddleware";
 
 const Router = express.Router();
 
-Router.route("/:userId")
-  .get(cartController.getCartByUserId)
-  .delete(
-    authMiddleware.isAuthorized,
-    cartController.deleteAllProductsInCartByUserId
-  );
+Router.route("/:userId").delete(
+  authMiddleware.isAuthorized,
+  cartController.deleteAllProductsInCartByUserId
+);
 Router.route("/")
+  .get(authMiddleware.isAuthorized, cartController.getCartByUserId)
   .post(authMiddleware.isAuthorized, cartController.createNewCart)
   .delete(authMiddleware.isAuthorized, cartController.deleteProductInCart);
 
