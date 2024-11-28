@@ -69,17 +69,34 @@ const getOneById = async (id) => {
 
 const updateOrderStatusById = async (id, statusId, userId) => {
   try {
+    if (id) {
+      const order = await orderModel.getOneById(id);
+      if (
+        order.statusInfo[0]._id.toString() === "67321305f823c69a6e65659f" &&
+        statusId !== "67321305f823c69a6e65659f"
+      ) {
+        for (const item of order.items) {
+          const product = await productModel.findOneById(item.productId);
+          const newCountInStock =
+            parseFloat(product.countInStock) - parseFloat(item.quantity);
+          await productModel.updateCountInStock(
+            item.productId,
+            newCountInStock.toString()
+          );
+        }
+      }
+    }
     await orderModel.updateOrderStatusById(id, statusId);
 
     if (statusId === "67321305f823c69a6e65659f") {
       const order = await orderModel.getOneById(id);
       for (const item of order.items) {
         const product = await productModel.findOneById(item.productId);
-        const newConstInStock =
+        const newCountInStock =
           parseFloat(product.countInStock) + parseFloat(item.quantity);
         await productModel.updateCountInStock(
           item.productId,
-          newConstInStock.toString()
+          newCountInStock.toString()
         );
       }
     }

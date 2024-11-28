@@ -73,7 +73,7 @@ function UpdateStatusForm(props) {
         <Select
           onChange={setAdminUpdateStatus}
           style={{ width: "100%" }}
-          value={onOrder.statusInfo[0].statusName || ""}
+          value={adminUpdateStatus}
         >
           {status.map((item) => (
             <Select.Option key={item._id} value={item._id}>
