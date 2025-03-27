@@ -75,11 +75,19 @@ function UpdateStatusForm(props) {
           style={{ width: "100%" }}
           value={adminUpdateStatus}
         >
-          {status.map((item) => (
-            <Select.Option key={item._id} value={item._id}>
-              {item.statusName}
-            </Select.Option>
-          ))}
+          {status
+            .filter(
+              (item) =>
+                !(
+                  adminUpdateStatus === "673212a4f823c69a6e65659c" &&
+                  item._id === "67321261f823c69a6e65659b"
+                )
+            )
+            .map((item) => (
+              <Select.Option key={item._id} value={item._id}>
+                {item.statusName}
+              </Select.Option>
+            ))}
         </Select>
       </Modal>
     </>

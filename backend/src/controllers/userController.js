@@ -176,6 +176,15 @@ const getAllUsers = async (req, res, next) => {
   }
 };
 
+const sendContactEmail = async (req, res, next) => {
+  try {
+    await userService.sendContactEmail(req.body);
+    return res.status(StatusCodes.OK).json({ message: "Gửi email thành công" });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const userController = {
   createNew,
   getOneUserById,
@@ -186,4 +195,5 @@ export const userController = {
   refreshToken,
   resetPasswordById,
   getAllUsers,
+  sendContactEmail,
 };

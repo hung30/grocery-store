@@ -23,15 +23,15 @@ const createNewOrder = async (userId, reqBody) => {
         );
       }
     }
-    for (const item of items) {
-      const product = await productModel.findOneById(item.productId);
-      const newConstInStock =
-        parseFloat(product.countInStock) - parseFloat(item.quantity);
-      await productModel.updateCountInStock(
-        item.productId,
-        newConstInStock.toString()
-      );
-    }
+    // for (const item of items) {
+    //   const product = await productModel.findOneById(item.productId);
+    //   const newConstInStock =
+    //     parseFloat(product.countInStock) - parseFloat(item.quantity);
+    //   await productModel.updateCountInStock(
+    //     item.productId,
+    //     newConstInStock.toString()
+    //   );
+    // }
     const data = {
       userId: new ObjectId(userId),
       ...reqBody,
@@ -73,12 +73,49 @@ const updateOrderStatusById = async (id, statusId, userId) => {
       const order = await orderModel.getOneById(id);
       if (
         order.statusInfo[0]._id.toString() === "67321305f823c69a6e65659f" &&
-        statusId !== "67321305f823c69a6e65659f"
+        statusId !== "67321305f823c69a6e65659f" &&
+        statusId === "67321261f823c69a6e65659c"
       ) {
         for (const item of order.items) {
           const product = await productModel.findOneById(item.productId);
           const newCountInStock =
             parseFloat(product.countInStock) - parseFloat(item.quantity);
+          if (newCountInStock < 0) {
+            throw new ApiError(
+              StatusCodes.BAD_REQUEST,
+              "Số lượng sản phẩm trong kho không đủ"
+            );
+          }
+          await productModel.updateCountInStock(
+            item.productId,
+            newCountInStock.toString()
+          );
+        }
+      } else if (
+        statusId === "67321305f823c69a6e65659f" &&
+        order.statusInfo[0]._id.toString() !== "67321261f823c69a6e65659b"
+      ) {
+        for (const item of order.items) {
+          const product = await productModel.findOneById(item.productId);
+          const newCountInStock =
+            parseFloat(product.countInStock) + parseFloat(item.quantity);
+          await productModel.updateCountInStock(
+            item.productId,
+            newCountInStock.toString()
+          );
+        }
+      } else if (statusId === "673212a4f823c69a6e65659c") {
+        const order = await orderModel.getOneById(id);
+        for (const item of order.items) {
+          const product = await productModel.findOneById(item.productId);
+          const newCountInStock =
+            parseFloat(product.countInStock) - parseFloat(item.quantity);
+          if (newCountInStock < 0) {
+            throw new ApiError(
+              StatusCodes.BAD_REQUEST,
+              "Số lượng sản phẩm trong kho không đủ"
+            );
+          }
           await productModel.updateCountInStock(
             item.productId,
             newCountInStock.toString()
@@ -88,18 +125,6 @@ const updateOrderStatusById = async (id, statusId, userId) => {
     }
     await orderModel.updateOrderStatusById(id, statusId);
 
-    if (statusId === "67321305f823c69a6e65659f") {
-      const order = await orderModel.getOneById(id);
-      for (const item of order.items) {
-        const product = await productModel.findOneById(item.productId);
-        const newCountInStock =
-          parseFloat(product.countInStock) + parseFloat(item.quantity);
-        await productModel.updateCountInStock(
-          item.productId,
-          newCountInStock.toString()
-        );
-      }
-    }
     return await orderModel.getOrdersByUserId(userId);
   } catch (error) {
     throw new Error(error);

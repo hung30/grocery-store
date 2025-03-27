@@ -71,9 +71,13 @@ export default function RegisterPage() {
     },
   });
 
+  const handleSendOtp = async () => {
+    console.log("send otp");
+  };
   return (
     <div className="flex flex-col justify-start items-center">
-      <div className="w-full p-10  md:w-1/2 lg:w-1/3 xl:w-1/4 mt-8">
+      {/* <div className="w-full p-10  md:w-1/2 lg:w-1/3 xl:w-1/4 mt-8"> */}
+      <div className="w-full p-10  md:w-1/2 lg:w-1/3 mt-8">
         <div className="text-2xl text-blue-500 font-medium text-center uppercase">
           Đăng ký
         </div>
@@ -82,14 +86,25 @@ export default function RegisterPage() {
         </div>
         <form onSubmit={formik.handleSubmit} autoComplete="off">
           <div className="flex flex-col mb-14 gap-4">
-            <Input
-              type="text"
-              id="email"
-              name="email"
-              placeholder="Email *"
-              setData={formik.handleChange}
-              error={formik.touched.email && formik.errors.email}
-            />
+            <div className="relative">
+              <Input
+                type="text"
+                id="email"
+                name="email"
+                placeholder="Email *"
+                setData={formik.handleChange}
+                error={formik.touched.email && formik.errors.email}
+              />
+              {formik.values.email && !formik.errors.email && (
+                <button
+                  type="button"
+                  onClick={handleSendOtp}
+                  className="absolute right-2 top-1/2 -translate-y-1/2  hover:text-blue-700 text-sm text-blue-500"
+                >
+                  Nhận OTP
+                </button>
+              )}
+            </div>
             <Input
               type="text"
               id="telephone"

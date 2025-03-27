@@ -12,6 +12,7 @@ Router.route("/reset-password").put(
   otpMiddleware.isVerifiedOtp,
   userController.resetPasswordById
 );
+Router.route("/send-contact-email").post(userController.sendContactEmail);
 Router.route("/refresh-token").put(userController.refreshToken);
 
 Router.route("/:id")
