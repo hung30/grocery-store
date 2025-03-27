@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 const BuyProductForm = ({
   buttonText,
+  error,
   onPurchase,
   classButtonName,
   countInStock = 0,
@@ -34,7 +35,7 @@ const BuyProductForm = ({
         if (buttonText === "Mua ngay") {
           onPurchase({ ...values, userData });
         } else {
-          onPurchase(values);
+          error.length > 0 ? message.error("Lỗi!!!") : onPurchase(values);
         }
         setIsModalVisible(false);
       })
@@ -101,8 +102,14 @@ const BuyProductForm = ({
               rules={[
                 { required: true, message: "Vui lòng nhập số lượng cần mua" },
                 {
-                  pattern: /^[0-9]*[.,]?[0-9]+$/,
+                  pattern: /^-?[0-9]*[.,]?[0-9]+$/,
                   message: "Số lượng phải là số!",
+                },
+                {
+                  validator: (_, value) =>
+                    value > 0
+                      ? Promise.resolve()
+                      : Promise.reject("Số lượng phải lớn hơn 0!"),
                 },
               ]}
             >

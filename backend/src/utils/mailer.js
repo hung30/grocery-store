@@ -27,3 +27,25 @@ export const sendOtpEmail = async (to, otp) => {
 
   return await transporter.sendMail(mailOptions);
 };
+
+export const sendContactEmailToAdmin = async (data) => {
+  const mailOptions = {
+    from: data.email,
+    to: env.EMAIL_USER,
+    subject: `Liên hệ từ ${data.name}`,
+    text: `Họ và tên: ${data.name}\nEmail: ${data.email}\nNội dung: ${data.message}`,
+  };
+
+  return await transporter.sendMail(mailOptions);
+};
+
+export const sendContactEmailToUser = async (data) => {
+  const mailOptions = {
+    from: env.EMAIL_USER,
+    to: data.email,
+    subject: "Xác nhận gửi liên hệ",
+    text: `Cảm ơn ${data.name} đã liên hệ với chúng tôi!\nNội dung bạn gửi: ${data.message}\nChúng tôi sẽ phản hồi sớm nhất có thể.`,
+  };
+
+  return await transporter.sendMail(mailOptions);
+};

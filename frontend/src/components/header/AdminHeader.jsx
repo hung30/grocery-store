@@ -40,7 +40,9 @@ function AdminHeader() {
 
   return (
     <Header style={headerStyle}>
-      <div></div>
+      <Link to="/" style={{ color: "#fff", fontSize: "18px" }}>
+        Home
+      </Link>
       <Link to="/admin" style={{ color: "#fff", fontSize: "18px" }}>
         Admin Dashboard
       </Link>

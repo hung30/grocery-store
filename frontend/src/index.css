@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+
+  .scrollbar-colored {
+    scrollbar-color: #ddd3f9 transparent;
+  }
+}
 /* ct: custom  */
 .ct-top-menu-item {
   @apply cursor-pointer py-1 hover:text-yellow-400 relative after:absolute after:bottom-0 after:left-0 after:bg-yellow-400 after:h-0.5 after:w-0 hover:after:w-full after:transition-all after:ease-in-out after:duration-300 whitespace-nowrap;
@@ -25,4 +34,31 @@
 
 .ct-subheadline-label {
   @apply uppercase mx-4 tracking-widest text-gray-500 font-medium text-[12px] text-center dark:text-white;
+}
+
+.ct-message {
+  @apply flex items-center gap-3;
+}
+
+.chat-body .bot-message .message-text {
+  @apply py-3 px-4 max-w-[75%] bg-blue-200 rounded-[13px_13px_13px_3px] break-words whitespace-pre-line text-base;
+}
+
+.chat-body .user-message {
+  @apply flex-col;
+}
+
+.chat-body .user-message .message-text {
+  @apply py-3 px-4 max-w-[75%] bg-blue-500 rounded-[13px_13px_3px_13px] text-white break-words whitespace-pre-line text-base;
+}
+
+.ct-message-input {
+  @apply border-none outline-none bg-none h-[47px] w-full py-0 px-[17px] text-base;
+}
+.ct-message-input:valid + .ct-chat-button {
+  @apply block;
+}
+
+.ct-chat-button {
+  @apply h-[35px] w-[35px] border-none outline-none hidden cursor-pointer text-2xl text-white shrink-0 mr-[6px] rounded-full bg-blue-500 hover:bg-blue-700 transition duration-200 ease-in-out;
 }

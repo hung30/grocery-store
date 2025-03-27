@@ -12,6 +12,8 @@ import { Link } from "react-router-dom";
 function CartPage() {
   // const cart = useSelector((state) => state.cart.cartItems);
   const [cart, setCart] = useState([]);
+  const [error, setError] = useState([]);
+  const [errorText, setErrorText] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
   const [quantities, setQuantities] = useState({});
   const { setIsLoading } = useContext(LoadingContext);
@@ -35,14 +37,15 @@ function CartPage() {
 
   useEffect(() => {
     let total = 0;
-    cart.forEach((item) => {
-      const quantity = quantities[item?.productId] || 1;
-      const priceToInt = parseFloat(item?.products?.price);
+    error.length === 0 &&
+      cart.forEach((item) => {
+        const quantity = quantities[item?.productId] || 1;
+        const priceToInt = parseFloat(item?.products?.price);
 
-      total += priceToInt * quantity;
-    });
+        total += priceToInt * quantity;
+      });
     setTotalPrice(total);
-  }, [cart, quantities]);
+  }, [cart, quantities, error]);
 
   useEffect(() => {
     const storedQuantities = JSON.parse(localStorage.getItem("quantities"));
@@ -51,18 +54,60 @@ function CartPage() {
     }
   }, []);
 
-  const handleQuantityChange = (productId) => (e) => {
-    const newQuantity = parseFloat(e.target.value);
+  const handleQuantityChange = (productId, countInStock) => (e) => {
+    console.log(typeof countInStock);
+    const value = e.target.value.trim();
+    const numberRegex = /^-?[0-9]*[.,]?[0-9]+$/;
+    if (!value || parseFloat(value) <= 0) {
+      let newError = [...error];
+      !newError.includes(productId) && newError.push(productId);
+      setError(newError);
 
-    const storedQuantities =
-      JSON.parse(localStorage.getItem("quantities")) || {};
-    storedQuantities[productId] = newQuantity;
-    localStorage.setItem("quantities", JSON.stringify(storedQuantities));
+      if (!numberRegex.test(value)) {
+        let newErrorText = errorText.filter(
+          (item) => item.productId !== productId
+        );
+        newErrorText.push({ productId, message: "Số lượng phải là số" });
+        setErrorText(newErrorText);
+      } else {
+        let newErrorText = errorText.filter(
+          (item) => item.productId !== productId
+        );
+        newErrorText.push({ productId, message: "Số lượng phải lớn hơn 0" });
+        setErrorText(newErrorText);
+      }
+    } else {
+      setError(error.filter((id) => id !== productId));
+      setErrorText(errorText.filter((item) => item.productId !== productId));
 
-    setQuantities({
-      ...quantities,
-      [productId]: newQuantity,
-    });
+      if (parseFloat(value) > parseFloat(countInStock)) {
+        let newError = [...error];
+        !newError.includes(productId) && newError.push(productId);
+        setError(newError);
+        let newErrorText = errorText.filter(
+          (item) => item.productId !== productId
+        );
+        newErrorText.push({
+          productId,
+          message: `Số lượng phải bé hơn ${countInStock}kg`,
+        });
+        setErrorText(newErrorText);
+      } else {
+        setError(error.filter((id) => id !== productId));
+        setErrorText(errorText.filter((item) => item.productId !== productId));
+        const newQuantity = parseFloat(value);
+
+        const storedQuantities =
+          JSON.parse(localStorage.getItem("quantities")) || {};
+        storedQuantities[productId] = newQuantity;
+        localStorage.setItem("quantities", JSON.stringify(storedQuantities));
+
+        setQuantities({
+          ...quantities,
+          [productId]: newQuantity,
+        });
+      }
+    }
   };
 
   const handleDeleteCart = async (productId) => {
@@ -120,7 +165,6 @@ function CartPage() {
       console.log(error);
     }
   };
-
   return (
     <div className="bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
       <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
@@ -148,20 +192,39 @@ function CartPage() {
                           className="w-32 h-32 rounded-lg"
                         />
                       </div>
-                      <div className="sm:text-start basis-1/6 text-center mb-4 dark:text-white">
+                      <div className="sm:text-start basis-1/6 text-center mb-4 sm:mb-0 dark:text-white">
                         <strong>{item.products.name}</strong>
                       </div>
-                      <div className="basis-3/6 flex justify-center gap-4 text-center">
+                      <div className="basis-3/6 flex justify-center items-center gap-4 text-center">
                         <div className="basis-1/4">
                           <input
                             type="number"
                             placeholder="Nhập số kg"
-                            min={1}
+                            min={0.1}
                             step={0.1}
-                            onChange={handleQuantityChange(item.productId)}
-                            className="w-28 border-[1px]  border-gray-500 rounded-md pl-2"
+                            onChange={handleQuantityChange(
+                              item.productId,
+                              item.products.countInStock
+                            )}
+                            className={`dark:bg-slate-100 w-28 border-[1px] rounded-md pl-2 relative ${
+                              error.some((id) => id === item.productId)
+                                ? "dark:border-[2px] border-red-500 outline-red-500"
+                                : "border-gray-500"
+                            }`}
                             defaultValue={quantities[item.productId] || 1}
                           />
+                          {errorText.some(
+                            (product) => product.productId === item.productId
+                          ) && (
+                            <p className="text-red-500 text-xs ">
+                              {
+                                errorText.find(
+                                  (product) =>
+                                    product.productId === item.productId
+                                ).message
+                              }
+                            </p>
+                          )}
                         </div>
                         <div className="basis-2/4 dark:text-white">
                           <strong>{formatCurrency(item.products.price)}</strong>
@@ -212,6 +275,7 @@ function CartPage() {
 
                 <BuyProductForm
                   buttonText="Mua hàng"
+                  error={error}
                   onPurchase={handlePurchase}
                 />
 

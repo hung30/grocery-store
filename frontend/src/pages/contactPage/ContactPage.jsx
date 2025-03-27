@@ -1,9 +1,43 @@
 import { message } from "antd";
-import React from "react";
+import React, { useContext, useState } from "react";
+import authorizedAxiosInstance from "../../utils/authorizedAxios";
+import { LoadingContext } from "../../contexts/LoadingContext";
+import { env } from "../../config/environment";
 
 export default function ContactPage() {
-  const handleSubmit = () => {
-    message.success("Gửi thành công!");
+  const { setIsLoading } = useContext(LoadingContext);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!formData.name || !formData.email || !formData.message) {
+      message.error("Vui lòng điền đầy đủ các trường!");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await authorizedAxiosInstance.post(
+        `${env.API_URL}/v1/users/send-contact-email`,
+        formData
+      );
+      message.success("Gửi thành công!");
+      setFormData({ name: "", email: "", message: "" });
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      console.error(error);
+    }
   };
 
   return (
@@ -24,7 +58,10 @@ export default function ContactPage() {
             Form liên hệ
           </h2>
         </div>
-        <form className="max-w-lg mx-auto bg-white p-5 rounded-md border dark:bg-neutral-900">
+        <form
+          onSubmit={handleSubmit}
+          className="max-w-lg mx-auto bg-white p-5 rounded-md border dark:bg-neutral-900"
+        >
           <label htmlFor="name" className="block mb-2">
             Họ và tên:
           </label>
@@ -32,7 +69,10 @@ export default function ContactPage() {
             type="text"
             id="name"
             name="name"
+            value={formData.name}
+            onChange={handleChange}
             className="w-full p-2 mb-4 border border-gray-300 rounded-md dark:bg-gray-300"
+            required
           />
           <label htmlFor="email" className="block mb-2">
             Email:
@@ -41,7 +81,10 @@ export default function ContactPage() {
             type="email"
             id="email"
             name="email"
+            value={formData.email}
+            onChange={handleChange}
             className="w-full p-2 mb-4 border border-gray-300 rounded-md dark:bg-gray-300"
+            required
           />
           <label htmlFor="message" className="block mb-2">
             Nội dung:
@@ -50,12 +93,14 @@ export default function ContactPage() {
             id="message"
             name="message"
             rows="4"
+            value={formData.message}
+            onChange={handleChange}
             className="w-full p-2 mb-4 border border-gray-300 rounded-md resize-none dark:bg-gray-300"
+            required
           ></textarea>
           <div className="text-center">
             <button
-              type="button"
-              onClick={handleSubmit}
+              type="submit"
               className="w-20 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
             >
               Gửi

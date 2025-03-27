@@ -4,6 +4,10 @@ import { JwtProvider } from "~/providers/JwtProvider";
 import { env } from "~/config/environment";
 import { StatusCodes } from "http-status-codes";
 import ApiError from "~/utils/ApiError";
+import {
+  sendContactEmailToAdmin,
+  sendContactEmailToUser,
+} from "~/utils/mailer";
 const createNew = async (reqBody) => {
   try {
     const newUser = {
@@ -126,6 +130,28 @@ const getAllUsers = async () => {
   }
 };
 
+const sendContactEmail = async (reqBody) => {
+  try {
+    const { name, email, message } = reqBody;
+    if (!name || !email || !message) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        "Vui lòng điền đầy đủ thông tin"
+      );
+    }
+    await sendContactEmailToAdmin(reqBody);
+    await sendContactEmailToUser(reqBody);
+  } catch (error) {
+    if (error.code === "EENVELOPE" || error.responseCode === 550) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        "Email bạn nhập có thể không tồn tại. Vui lòng kiểm tra lại!"
+      );
+    }
+    throw error;
+  }
+};
+
 export const userService = {
   createNew,
   getOneUserById,
@@ -134,4 +160,5 @@ export const userService = {
   login,
   resetPasswordById,
   getAllUsers,
+  sendContactEmail,
 };
