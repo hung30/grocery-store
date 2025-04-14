@@ -49,3 +49,73 @@ export const sendContactEmailToUser = async (data) => {
 
   return await transporter.sendMail(mailOptions);
 };
+
+// Hàm hỗ trợ lấy tiêu đề và nội dung email dựa trên statusId
+const getEmailContent = (statusId, orderId) => {
+  const statusMap = {
+    "67321261f823c69a6e65659b": {
+      subject: "Đơn hàng của bạn đang chờ xác nhận",
+      message:
+        "Đơn hàng #{orderId} của bạn đã được đặt thành công và đang chờ xác nhận. Chúng tôi sẽ thông báo khi đơn hàng được xử lý.",
+    },
+    "673212a4f823c69a6e65659c": {
+      subject: "Đơn hàng của bạn đã được xác nhận",
+      message:
+        "Đơn hàng #{orderId} của bạn đã được xác nhận. Chúng tôi đang chuẩn bị hàng để giao đến bạn.",
+    },
+    "673212b8f823c69a6e65659d": {
+      subject: "Đơn hàng của bạn đang được vận chuyển",
+      message:
+        "Đơn hàng #{orderId} của bạn đang trên đường giao đến bạn. Vui lòng chuẩn bị để nhận hàng.",
+    },
+    "673212d1f823c69a6e65659e": {
+      subject: "Đơn hàng của bạn đã được giao",
+      message:
+        "Đơn hàng #{orderId} của bạn đã được giao thành công. Cảm ơn bạn đã mua sắm với chúng tôi!",
+    },
+    "67321305f823c69a6e65659f": {
+      subject: "Đơn hàng của bạn đã bị hủy",
+      message:
+        "Đơn hàng #{orderId} của bạn đã bị hủy theo yêu cầu. Nếu có thắc mắc, vui lòng liên hệ với chúng tôi.",
+    },
+  };
+
+  const content = statusMap[statusId] || {
+    subject: "Cập nhật trạng thái đơn hàng",
+    message: "Trạng thái đơn hàng #{orderId} của bạn đã được cập nhật.",
+  };
+
+  return {
+    subject: content.subject.replace("#{orderId}", orderId),
+    message: content.message.replace("#{orderId}", orderId),
+  };
+};
+
+// Hàm gửi email thông báo trạng thái đơn hàng
+export const sendOrderStatusEmail = async (userEmail, orderId, statusId) => {
+  try {
+    const { subject, message } = getEmailContent(statusId, orderId);
+
+    const mailOptions = {
+      from: env.EMAIL_USER,
+      to: userEmail,
+      subject: subject,
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #333;">Thông báo trạng thái đơn hàng</h2>
+          <p>Xin chào,</p>
+          <p>${message}</p>
+          <p>Mã đơn hàng: <strong>${orderId}</strong></p>
+          <p>Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi qua email ${env.EMAIL_USER}.</p>
+          <p>Trân trọng,<br>Đội ngũ hỗ trợ</p>
+        </div>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    return { success: true, message: "Email thông báo đã được gửi" };
+  } catch (error) {
+    console.log(error);
+    throw new Error(`Gửi email thất bại: ${error.message}`);
+  }
+};

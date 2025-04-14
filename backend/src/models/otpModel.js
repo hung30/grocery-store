@@ -4,8 +4,9 @@ import { GET_DB } from "~/config/mongodb";
 
 const OTP_COLLECTION_NAME = "otps";
 const OTP_SCHEMA = Joi.object({
-  userId: Joi.object().required(),
+  userId: Joi.object(),
   otp: Joi.string().required().trim().strict(),
+  email: Joi.string().email().trim().strict(),
   expiredAt: Joi.date()
     .timestamp("javascript")
     .default(() => new Date(Date.now() + 10 * 60 * 1000).getTime()),
@@ -36,7 +37,17 @@ const findLatestOtpByUserId = async (userId) => {
   try {
     return await GET_DB()
       .collection(OTP_COLLECTION_NAME)
-      .findOne({ userId }, { sort: { createdAt: -1 } });
+      .findOne({ userId: userId }, { sort: { createdAt: -1 } });
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+const findLatestOtpByEmail = async (email) => {
+  try {
+    return await GET_DB()
+      .collection(OTP_COLLECTION_NAME)
+      .findOne({ email: email }, { sort: { createdAt: -1 } });
   } catch (error) {
     throw new Error(error);
   }
@@ -65,6 +76,7 @@ const createTTLIndexForDeleteOtpExpired = async () => {
 export const otpModel = {
   createNewOtp,
   findLatestOtpByUserId,
+  findLatestOtpByEmail,
   deleteOtpById,
   createTTLIndexForDeleteOtpExpired,
 };

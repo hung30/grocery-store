@@ -219,6 +219,16 @@ const deleteOrderById = async (id) => {
   }
 };
 
+const getOrderByOrderId = async (orderId) => {
+  try {
+    return await GET_DB()
+      .collection(ORDER_COLLECTION_NAME)
+      .findOne({ _id: new ObjectId(orderId) });
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 export const orderModel = {
   createNewOrder,
   getOneById,
@@ -226,4 +236,5 @@ export const orderModel = {
   getOrdersByUserId,
   updateOrderStatusById,
   deleteOrderById,
+  getOrderByOrderId,
 };
