@@ -2,7 +2,9 @@ import { StatusCodes } from "http-status-codes";
 import { ObjectId } from "mongodb";
 import { orderModel } from "~/models/orderModel";
 import { productModel } from "~/models/productModel";
+import { userModel } from "~/models/userModel";
 import ApiError from "~/utils/ApiError";
+import { sendOrderStatusEmail } from "~/utils/mailer";
 
 const createNewOrder = async (userId, reqBody) => {
   try {
@@ -123,9 +125,18 @@ const updateOrderStatusById = async (id, statusId, userId) => {
         }
       }
     }
-    await orderModel.updateOrderStatusById(id, statusId);
 
-    return await orderModel.getOrdersByUserId(userId);
+    await orderModel.updateOrderStatusById(id, statusId);
+    const order = await orderModel.getOneById(id);
+    const user = await userModel.findOneById(order.userId);
+
+    if (!user) {
+      throw new ApiError(StatusCodes.NOT_FOUND, "Người dùng không tồn tại");
+    }
+
+    await sendOrderStatusEmail(user.email, id, statusId);
+
+    return await orderModel.getOrdersByUserId(order.userId);
   } catch (error) {
     throw new Error(error);
   }

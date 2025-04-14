@@ -10,21 +10,55 @@ import { Tooltip, Modal } from "antd";
 function Chatbot({ onToggleChatbot }) {
   const [products, setProducts] = useState([]);
   const [chatHistory, setChatHistory] = useState(() => {
-    // Lấy chatHistory từ localStorage khi khởi tạo, nếu không có thì dùng giá trị mặc định
+    // Lấy chatHistory và timestamp từ localStorage
     const savedHistory = localStorage.getItem("chatHistory");
-    return savedHistory
-      ? JSON.parse(savedHistory)
-      : [
+    const savedTimestamp = localStorage.getItem("chatHistoryTimestamp");
+
+    // Kiểm tra nếu đã qua 2 ngày (2 * 24 * 60 * 60 * 1000 = 172800000 ms)
+    if (savedTimestamp && savedHistory) {
+      const currentTime = new Date().getTime();
+      const timeDifference = currentTime - parseInt(savedTimestamp, 10);
+      const twoDaysInMs = 2 * 24 * 60 * 60 * 1000;
+
+      if (timeDifference > twoDaysInMs) {
+        // Xóa localStorage nếu đã quá 2 ngày
+        localStorage.removeItem("chatHistory");
+        localStorage.removeItem("chatHistoryTimestamp");
+        return [
           {
             hideInChat: true,
             role: "model",
             message: "",
           },
         ];
+      }
+      return JSON.parse(savedHistory);
+    }
+
+    // Giá trị mặc định nếu không có dữ liệu
+    return [
+      {
+        hideInChat: true,
+        role: "model",
+        message: "",
+      },
+    ];
   });
 
   const chatBodyRef = useRef();
   const chatbotRef = useRef();
+
+  // Lưu chatHistory và timestamp vào localStorage
+  useEffect(() => {
+    if (chatHistory.length > 0) {
+      localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
+      // Lưu thời điểm hiện tại làm timestamp
+      localStorage.setItem(
+        "chatHistoryTimestamp",
+        new Date().getTime().toString()
+      );
+    }
+  }, [chatHistory]);
 
   // Lấy dữ liệu products từ API
   useEffect(() => {
@@ -116,10 +150,10 @@ function Chatbot({ onToggleChatbot }) {
 
   const handleDeleteChatHistory = () => {
     Modal.confirm({
-      title: 'Xác nhận',
-      content: 'Bạn có chắc chắn muốn xóa không?',
-      okText: 'Xóa',
-      cancelText: 'Hủy',
+      title: "Xác nhận",
+      content: "Bạn có chắc chắn muốn xóa không?",
+      okText: "Xóa",
+      cancelText: "Hủy",
       onOk() {
         setChatHistory([
           {
@@ -129,12 +163,13 @@ function Chatbot({ onToggleChatbot }) {
           },
         ]);
         localStorage.removeItem("chatHistory");
+        localStorage.removeItem("chatHistoryTimestamp");
       },
       onCancel() {
-        console.log('Hủy bỏ thao tác!');
+        console.log("Hủy bỏ thao tác!");
       },
     });
-  }
+  };
 
   return (
     <div className="chatbot">
@@ -167,7 +202,10 @@ function Chatbot({ onToggleChatbot }) {
           </div>
           <div className="header-buttons flex items-center gap-2">
             <Tooltip title="Xoá lịch sử chat">
-              <button className="h-10 w-10 border-none outline-none text-red-500 cursor-pointer text-xl pt-0.5 rounded-full  bg-none flex justify-center items-center duration-200 ease-in-out hover:bg-black/10" onClick={handleDeleteChatHistory}>
+              <button
+                className="h-10 w-10 border-none outline-none text-red-500 cursor-pointer text-xl pt-0.5 rounded-full  bg-none flex justify-center items-center duration-200 ease-in-out hover:bg-black/10"
+                onClick={handleDeleteChatHistory}
+              >
                 <DeleteOutlined />
               </button>
             </Tooltip>
