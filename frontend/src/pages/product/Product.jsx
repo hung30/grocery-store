@@ -12,9 +12,11 @@ import { message } from "antd";
 import { addToCart } from "../../redux/cartSlice";
 import BuyProductForm from "../../components/buyProductForm/BuyProductForm";
 import { slugify } from "./../../utils/formatters";
+import { CloseOutlined } from "@ant-design/icons";
 
 export default function Product() {
   const [products, setProducts] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
   const [totalPage, setTotalPage] = useState(0);
   const [currentPage, setCurrentPage] = useState(0); // Trang hiện tại bắt đầu từ 0
   const [displayedProducts, setDisplayedProducts] = useState([]);
@@ -69,17 +71,28 @@ export default function Product() {
   }, [dispatch, navigate]);
 
   useEffect(() => {
+    if (!search) {
+      setSearchResults([]); // Nếu không có tìm kiếm, đặt searchResults rỗng
+      return;
+    }
     const filteredProducts = products.filter((product) =>
       product.slug.toLowerCase().includes(search.toLowerCase())
     );
-    setDisplayedProducts(
-      filteredProducts.slice(
-        currentPage * productsPerPage,
-        (currentPage + 1) * productsPerPage
-      )
-    );
-    setTotalPage(Math.ceil(filteredProducts.length / productsPerPage));
-  }, [search, products, currentPage, productsPerPage]);
+    setSearchResults(filteredProducts);
+  }, [search, products]);
+
+  // useEffect(() => {
+  //   const filteredProducts = products.filter((product) =>
+  //     product.slug.toLowerCase().includes(search.toLowerCase())
+  //   );
+  //   setDisplayedProducts(
+  //     filteredProducts.slice(
+  //       currentPage * productsPerPage,
+  //       (currentPage + 1) * productsPerPage
+  //     )
+  //   );
+  //   setTotalPage(Math.ceil(filteredProducts.length / productsPerPage));
+  // }, [search, products, currentPage, productsPerPage]);
 
   // Danh sách sản phẩm để hiển thị trên trang hiện tại
 
@@ -148,6 +161,12 @@ export default function Product() {
     // setSearch(slugify(searchToSlug));
   };
 
+  const handleDeleteProduct = (productId) => {
+    setSearchResults((prevResults) =>
+      prevResults.filter((product) => product._id !== productId)
+    );
+  };
+
   return (
     <div className="flex flex-col items-center w-full gap-4 mx-auto xl:px-24 dark:bg-neutral-900">
       <div className="text-3xl font-medium p-4 uppercase dark:text-white">
@@ -192,20 +211,17 @@ export default function Product() {
                 className="px-4 py-2 w-[350px] bg-inherit border-[1px] border-gray-700   dark:border-white outline-none leading-5 hover:border-gray-300 duration-500 focus:border-gray-300 placeholder:uppercase placeholder:text-xs placeholder:tracking-widest placeholder:font-semibold"
                 onChange={handleSearchChange}
               />
-              <ul
-                className={`absolute bg-white w-[350px] mt-1 max-h-60 overflow-y-auto z-10 ${
-                  search && "border border-gray-300"
-                }`}
-              >
-                {search &&
-                  products
-                    .filter((product) =>
-                      product.slug.toLowerCase().includes(search.toLowerCase())
-                    )
-                    .map((product) => (
+              {searchResults.length > 0 && (
+                <ul
+                  className={`absolute bg-white w-[350px] mt-1 max-h-60 overflow-y-auto z-10 ${
+                    search && "border border-gray-300"
+                  }`}
+                >
+                  {search &&
+                    searchResults.map((product) => (
                       <li
                         key={product._id}
-                        className="px-4 py-2 cursor-pointer hover:bg-gray-200"
+                        className="px-4 py-2 cursor-pointer hover:bg-gray-200 flex justify-between items-center"
                         onClick={() =>
                           navigate(`/product-detail/${product._id}`)
                         }
@@ -218,9 +234,19 @@ export default function Product() {
                           />
                           <span>{product.name}</span>
                         </div>
+                        <button
+                          className="text-gray-500 hover:text-red-500"
+                          onClick={(e) => {
+                            e.stopPropagation(); // Ngăn sự kiện click lan tỏa đến thẻ <li>
+                            handleDeleteProduct(product._id);
+                          }}
+                        >
+                          <CloseOutlined />
+                        </button>
                       </li>
                     ))}
-              </ul>
+                </ul>
+              )}
             </div>
             <div className="ct-form-item text-center">
               <button className="uppercase bg-blue-400 dark:bg-blue-600 text-yellow-100 dark:text-white tracking-wider px-2 py-2 text-xs font-semibold rounded hover:bg-opacity-80 h-[37.6px] w-max">

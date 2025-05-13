@@ -9,6 +9,7 @@ import { message } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function ForgotPasswordPage() {
+  const [countOtp, setCountOtp] = useState(0);
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
@@ -57,11 +58,29 @@ export default function ForgotPasswordPage() {
         }
       );
       setToken(res.data.verifyOtp);
+      setCountOtp(0);
       setIsLoading(false);
       setStep(3);
     } catch (error) {
-      setIsLoading(false);
-      console.log(error);
+      if (error.response.status === 429 && countOtp <= 5) {
+        setCountOtp((prevCount) => {
+          const newCount = prevCount + 1;
+          if (newCount > 5) {
+            setCountOtp(0);
+            message.error(
+              "Bạn đã nhập sai OTP quá 5 lần, hệ thống sẽ gửi lại mã OTP vào email của bạn"
+            );
+            handleResendOtp();
+          } else {
+            message.error(`Bạn đã nhập sai OTP ${newCount} lần`);
+            return newCount;
+          }
+        });
+        setIsLoading(false);
+      } else {
+        setIsLoading(false);
+        console.log(error);
+      }
     }
   };
 

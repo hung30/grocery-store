@@ -78,7 +78,7 @@ authorizedAxiosInstance.interceptors.response.use(
       });
     }
 
-    if (error.response?.status !== 410) {
+    if (error.response?.status !== 410 && error.response?.status !== 429) {
       message.error(
         error.response?.data?.message.replace(/^ApiError:\s*/, "") ||
           error?.message.replace(/^ApiError:\s*/, "")
