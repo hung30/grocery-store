@@ -61,7 +61,10 @@ const verifyOtp = async (reqBody) => {
     }
     const isMatch = await Bcrypt.compareData(otp, otpRecord.otp);
     if (!isMatch) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, "Mã OTP không chính xác");
+      throw new ApiError(
+        StatusCodes.TOO_MANY_REQUESTS,
+        "Mã OTP không chính xác"
+      );
     }
     if (otpRecord.expiredAt < new Date()) {
       throw new ApiError(StatusCodes.BAD_REQUEST, "Mã OTP đã hết hạn");
