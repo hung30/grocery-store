@@ -23,4 +23,9 @@ export const env = {
   EMAIL_PASSWORD: process.env.EMAIL_PASSWORD,
 
   URL_FRONTEND: process.env.URL_FRONTEND,
+
+  VNPAY_TMN_CODE: process.env.VNPAY_TMNCODE,
+  VNPAY_HASH_SECRET: process.env.VNPAY_HASH_SECRET,
+  VNPAY_RETURN_URL: process.env.VNPAY_RETURN_URL,
+  VNPAY_URL: process.env.VNPAY_URL,
 };

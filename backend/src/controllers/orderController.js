@@ -1,11 +1,43 @@
 import { StatusCodes } from "http-status-codes";
 import { orderService } from "~/services/orderService";
 import ApiError from "~/utils/ApiError";
+import { inFormEmailForAdmin, informEmailForUser } from "~/utils/mailer";
 
 const createNewOrder = async (req, res, next) => {
   try {
     const userId = req.jwtDecoded._id;
     const createdOrder = await orderService.createNewOrder(userId, req.body);
+    if (!createdOrder) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, "Tạo đơn hàng thất bại");
+    }
+    // Gửi email thông báo cho người dùng
+    await informEmailForUser(
+      req.jwtDecoded.email,
+      createdOrder.nameOrder,
+      createdOrder._id.toString()
+    );
+    // Gửi email thông báo cho admin
+    await inFormEmailForAdmin(
+      createdOrder.userInfo.name,
+      createdOrder.nameOrder,
+      createdOrder._id.toString()
+    );
+    return res.status(StatusCodes.CREATED).json({
+      message: "Tạo đơn hàng thành công",
+      order: createdOrder,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const createNewOrderForOnlinePayment = async (req, res, next) => {
+  try {
+    const userId = req.jwtDecoded._id;
+    const createdOrder = await orderService.createNewOrderForOnlinePayment(
+      userId,
+      req.body
+    );
     if (!createdOrder) {
       throw new ApiError(StatusCodes.BAD_REQUEST, "Tạo đơn hàng thất bại");
     }
@@ -103,6 +135,7 @@ const deleteOrderById = async (req, res, next) => {
 
 export const orderController = {
   createNewOrder,
+  createNewOrderForOnlinePayment,
   getOrdersByUserId,
   getAllOrders,
   getOneById,

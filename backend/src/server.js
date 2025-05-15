@@ -11,9 +11,13 @@ import session from "express-session";
 import passport from "passport";
 import "~/config/passport";
 import { otpModel } from "./models/otpModel";
+import { startOrderCleanupJob } from "./jobs/orderCleanupJob";
 
 const START_SERVER = () => {
   const app = express();
+
+  // Cấu hình trust proxy
+  app.set("trust proxy", true);
 
   app.use(cookieParser());
   app.use(cors(corsOptions));
@@ -63,6 +67,7 @@ const START_SERVER = () => {
     await CONNECT_DB();
     await otpModel.createTTLIndexForDeleteOtpExpired();
     console.log("Connected to DB");
+    startOrderCleanupJob();
 
     START_SERVER();
   } catch (error) {

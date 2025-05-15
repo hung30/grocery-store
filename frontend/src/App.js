@@ -34,6 +34,7 @@ import Orders from "./pages/adminPages/Orders";
 import FloatButtonComponent from "./components/floatButton/FloatButton";
 import { useSelector } from "react-redux";
 import TitleUpdater from "./components/titleUpdater/TitleUpdater";
+import PaymentErrorPage from "./pages/paymentErrorPage/PaymentErrorPage";
 
 const ProtectedRoutes = () => {
   const user = JSON.parse(localStorage.getItem("userInfo"));
@@ -139,6 +140,10 @@ function App() {
             <Route element={<ProtectedRoutes />}>
               <Route path="/cart" element={<CartPage />} />
               <Route path="/order" element={<OrderPage />} />
+              <Route
+                path="/order/payment-return"
+                element={<PaymentErrorPage />}
+              />
               <Route path="/user" element={<UserPage />} />
               <Route
                 path="/user/change-password"

@@ -6,8 +6,9 @@ import authorizedAxiosInstance from "../../utils/authorizedAxios";
 import { env } from "../../config/environment";
 import { formatDate } from "../../utils/formatDate";
 import OrderStatus from "../../components/orderStatus/OrderStatus";
-import { message, Pagination } from "antd";
+import { message, Modal, Pagination, Radio } from "antd";
 import moment from "moment";
+import { useSearchParams } from "react-router-dom";
 
 moment.updateLocale("en", {
   week: {
@@ -23,6 +24,19 @@ export default function OrderPage() {
   const [orderType, setOrderType] = useState("tat-ca-don");
   const [duration, setDuration] = useState("this-week");
   const { setIsLoading } = useContext(LoadingContext);
+  const [searchParams] = useSearchParams();
+
+  // THÊM: State để quản lý modal và phương thức thanh toán
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+
+  useEffect(() => {
+    const messageParam = searchParams.get("message") || "";
+    if (messageParam === "success") {
+      message.success("Thanh toán thành công!");
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const order = async () => {
@@ -68,25 +82,88 @@ export default function OrderPage() {
       }
     }
   };
-  const handleOrderAgain = async (order) => {
-    const confirmOrderAgain = window.confirm("Bạn có muốn mua lại đơn hàng?");
-    if (confirmOrderAgain) {
-      const data = {
-        nameOrder: order.nameOrder,
-        userInfo: order.userInfo,
-        items: order.items.map((item) => ({
-          productId: item.productId,
-          quantity: item.quantity,
-        })),
-        totalPrice: order.totalPrice,
-      };
-      try {
+  // const handleOrderAgain = async (order) => {
+  //   const confirmOrderAgain = window.confirm("Bạn có muốn mua lại đơn hàng?");
+  //   if (confirmOrderAgain) {
+  //     const data = {
+  //       nameOrder: order.nameOrder,
+  //       userInfo: order.userInfo,
+  //       items: order.items.map((item) => ({
+  //         productId: item.productId,
+  //         quantity: item.quantity,
+  //       })),
+  //       totalPrice: order.totalPrice,
+  //     };
+  //     try {
+  //       setIsLoading(true);
+  //       const res = await authorizedAxiosInstance.post(
+  //         `${env.API_URL}/v1/orders`,
+  //         {
+  //           ...data,
+  //         }
+  //       );
+  //       const newOrders = [...orders, res.data.order];
+  //       setOrders(newOrders);
+  //       setOrderType("tat-ca-don");
+  //       setDuration("this-week");
+  //       setCurrentPage(1);
+  //       message.success("Mua lại đơn hàng thành công!");
+  //       setIsLoading(false);
+  //     } catch (error) {
+  //       setIsLoading(false);
+  //       console.log(error);
+  //     }
+  //   }
+  // };
+
+  // SỬA: Thay window.confirm bằng modal để chọn phương thức thanh toán
+  const handleOrderAgain = (order) => {
+    // Lưu đơn hàng được chọn và mở modal
+    setSelectedOrder(order);
+    setIsModalVisible(true);
+  };
+
+  // THÊM: Hàm xử lý khi xác nhận trong modal
+  const handleModalOk = async () => {
+    if (!selectedPaymentMethod) {
+      message.warning("Vui lòng chọn một phương thức thanh toán!");
+      return;
+    }
+
+    if (!selectedOrder) {
+      message.error("Không có đơn hàng được chọn!");
+      return;
+    }
+
+    const data = {
+      nameOrder: selectedOrder.nameOrder,
+      userInfo: selectedOrder.userInfo,
+      items: selectedOrder.items.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+      })),
+      totalPrice: selectedOrder.totalPrice,
+    };
+
+    try {
+      setIsLoading(true);
+      let res;
+      if (selectedPaymentMethod === "vnpay") {
+        // Gọi API cho VNPay
         setIsLoading(true);
-        const res = await authorizedAxiosInstance.post(
+        res = await authorizedAxiosInstance.post(
+          `${env.API_URL}/v1/VNPay/create_payment_url`,
+          data
+        );
+        setIsLoading(false);
+        if (res.data.paymentUrl) {
+          window.location.href = res.data.paymentUrl;
+        }
+      } else if (selectedPaymentMethod === "direct") {
+        // Gọi API cho thanh toán trực tiếp
+        res = await authorizedAxiosInstance.post(
           `${env.API_URL}/v1/orders`,
-          {
-            ...data,
-          }
+          data
         );
         const newOrders = [...orders, res.data.order];
         setOrders(newOrders);
@@ -94,12 +171,26 @@ export default function OrderPage() {
         setDuration("this-week");
         setCurrentPage(1);
         message.success("Mua lại đơn hàng thành công!");
-        setIsLoading(false);
-      } catch (error) {
-        setIsLoading(false);
-        console.log(error);
+      }
+      setIsLoading(false);
+      setIsModalVisible(false);
+      setSelectedPaymentMethod(null);
+      setSelectedOrder(null);
+    } catch (error) {
+      setIsLoading(false);
+      message.error("Có lỗi xảy ra khi mua lại đơn hàng!");
+      console.error(error);
+      if (selectedPaymentMethod === "vnpay") {
+        message.error(error.response.data.error);
       }
     }
+  };
+
+  // THÊM: Hàm xử lý khi hủy modal
+  const handleModalCancel = () => {
+    setIsModalVisible(false);
+    setSelectedPaymentMethod(null);
+    setSelectedOrder(null);
   };
 
   const handlePageSizeChange = (current, size) => {
@@ -298,6 +389,24 @@ export default function OrderPage() {
               )}
             </div>
           </div>
+
+          <Modal
+            title="Chọn phương thức thanh toán"
+            open={isModalVisible}
+            onOk={handleModalOk}
+            onCancel={handleModalCancel}
+            okText="Xác nhận"
+            cancelText="Hủy"
+          >
+            <Radio.Group
+              onChange={(e) => setSelectedPaymentMethod(e.target.value)}
+              value={selectedPaymentMethod}
+            >
+              <Radio value="direct">Thanh toán khi nhận hàng</Radio>
+              <Radio value="vnpay">Thanh toán bằng VNPay</Radio>
+            </Radio.Group>
+          </Modal>
+
           <nav className="mt-6 flex items-center justify-center sm:mt-8">
             <Pagination
               current={currentPage}

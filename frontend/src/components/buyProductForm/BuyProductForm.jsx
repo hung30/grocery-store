@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Modal, Form, Input, message } from "antd";
+import { Modal, Form, Input, message, Radio } from "antd";
 import { useNavigate } from "react-router-dom";
 
 const BuyProductForm = ({
@@ -118,6 +118,21 @@ const BuyProductForm = ({
               />
             </Form.Item>
           )}
+          <Form.Item
+            label="Phương thức thanh toán"
+            name="paymentMethod"
+            rules={[
+              {
+                required: true,
+                message: "Vui lòng chọn phương thức thanh toán!",
+              },
+            ]}
+          >
+            <Radio.Group>
+              <Radio value="1">Thanh toán khi nhận hàng</Radio>
+              <Radio value="2">Thanh toán bằng VNPay</Radio>
+            </Radio.Group>
+          </Form.Item>
         </Form>
       </Modal>
     </>
