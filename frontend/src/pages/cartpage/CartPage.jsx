@@ -127,6 +127,7 @@ function CartPage() {
   };
 
   const handlePurchase = async (values) => {
+    const { paymentMethod, ...valuesWithOutPaymentMethod } = values;
     let nameOrder = "";
     cart.forEach((item, index) => {
       nameOrder += item.products.name;
@@ -136,7 +137,7 @@ function CartPage() {
     });
     const orderItems = {
       nameOrder: nameOrder,
-      userInfo: values,
+      userInfo: valuesWithOutPaymentMethod,
       items: cart.map((item) => {
         return {
           productId: item.productId,
@@ -150,16 +151,35 @@ function CartPage() {
     const user = JSON.parse(localStorage.getItem("userInfo"));
     const userId = user._id;
     try {
-      setIsLoading(true);
-      await authorizedAxiosInstance.post(
-        `${env.API_URL}/v1/orders`,
-        orderItems
-      );
-      await authorizedAxiosInstance.delete(`${env.API_URL}/v1/cart/${userId}`);
-      dispatch(clearCart());
-      setCart([]);
-      message.success("Đặt hàng thành công!");
-      setIsLoading(false);
+      if (values.paymentMethod === "1") {
+        setIsLoading(true);
+        await authorizedAxiosInstance.post(
+          `${env.API_URL}/v1/orders`,
+          orderItems
+        );
+        await authorizedAxiosInstance.delete(
+          `${env.API_URL}/v1/cart/${userId}`
+        );
+        dispatch(clearCart());
+        setCart([]);
+        message.success("Đặt hàng thành công!");
+        setIsLoading(false);
+      } else if (values.paymentMethod === "2") {
+        setIsLoading(true);
+        const res = await authorizedAxiosInstance.post(
+          `${env.API_URL}/v1/VNPay/create_payment_url`,
+          orderItems
+        );
+        await authorizedAxiosInstance.delete(
+          `${env.API_URL}/v1/cart/${userId}`
+        );
+        dispatch(clearCart());
+        setCart([]);
+        setIsLoading(false);
+        if (res.data.paymentUrl) {
+          window.location.href = res.data.paymentUrl;
+        }
+      }
     } catch (error) {
       setIsLoading(false);
       console.log(error);

@@ -45,6 +45,37 @@ const createNewOrder = async (userId, reqBody) => {
   }
 };
 
+const createNewOrderForOnlinePayment = async (userId, reqBody) => {
+  try {
+    reqBody.items = reqBody.items.map((item) => ({
+      ...item,
+      productId: new ObjectId(item.productId),
+    }));
+    const { items } = reqBody;
+    for (const item of items) {
+      const product = await productModel.findOneById(item.productId);
+      if (!product) {
+        throw new ApiError(StatusCodes.NOT_FOUND, "Sản phẩm không tồn tại");
+      }
+      if (parseFloat(item.quantity) > parseFloat(product.countInStock)) {
+        throw new ApiError(
+          StatusCodes.BAD_REQUEST,
+          "Số lượng sản phẩm trong kho không đủ"
+        );
+      }
+    }
+
+    const data = {
+      userId: new ObjectId(userId),
+      ...reqBody,
+    };
+    const createdOrder = await orderModel.createNewOrderForOnlinePayment(data);
+    return await orderModel.getOneById(createdOrder.insertedId);
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 const getOrdersByUserId = async (userId) => {
   try {
     return await orderModel.getOrdersByUserId(userId);
@@ -95,7 +126,8 @@ const updateOrderStatusById = async (id, statusId, userId) => {
         }
       } else if (
         statusId === "67321305f823c69a6e65659f" &&
-        order.statusInfo[0]._id.toString() !== "67321261f823c69a6e65659b"
+        order.statusInfo[0]._id.toString() !== "67321261f823c69a6e65659b" &&
+        order.statusInfo[0]._id.toString() !== "6824b479efd1eaef703746da"
       ) {
         for (const item of order.items) {
           const product = await productModel.findOneById(item.productId);
@@ -152,6 +184,7 @@ const deleteOrderById = async (id) => {
 
 export const orderService = {
   createNewOrder,
+  createNewOrderForOnlinePayment,
   getOrdersByUserId,
   getAllOrders,
   getOneById,

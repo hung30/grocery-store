@@ -82,7 +82,8 @@ function DashBoard() {
     const revenue = orders.reduce((acc, order) => {
       if (
         order.statusInfo[0].statusName !== "Đã huỷ" &&
-        order.statusInfo[0].statusName !== "Chờ xác nhận"
+        order.statusInfo[0].statusName !== "Chờ xác nhận" &&
+        order.statusInfo[0].statusName !== "Chờ thanh toán"
       ) {
         return acc + parseFloat(order.totalPrice);
       }
@@ -317,7 +318,8 @@ function DashboardChart() {
         const ordersDone = res.data.filter((order) => {
           return (
             order.statusInfo[0].statusName !== "Chờ xác nhận" &&
-            order.statusInfo[0].statusName !== "Đã huỷ"
+            order.statusInfo[0].statusName !== "Đã huỷ" &&
+            order.statusInfo[0].statusName !== "Chờ thanh toán"
           );
         });
         const monthlyRevenue = ordersDone.reduce((acc, order) => {

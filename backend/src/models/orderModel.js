@@ -27,13 +27,55 @@ const ORDER_SCHEMA = Joi.object({
   updatedAt: Joi.date().timestamp("javascript").default(null),
 });
 
+const ORDER_SCHEMA_FOR_ONLINE_PAYMENT = Joi.object({
+  nameOrder: Joi.string().required().min(1).max(100).trim().strict(),
+  userId: Joi.object().required(),
+  userInfo: Joi.object({
+    name: Joi.string().required().min(1).max(30).trim().strict(),
+    telephone: Joi.string()
+      .trim()
+      .strict()
+      .pattern(/^[0-9]{10}$/)
+      .required(),
+    address: Joi.string().required().min(1).max(255).trim().strict(),
+  }),
+  items: Joi.array().items(
+    Joi.object({
+      productId: Joi.object().required(),
+      quantity: Joi.string().required().min(1).strict(),
+    })
+  ),
+  totalPrice: Joi.string().required().min(0).strict(),
+  statusId: Joi.object().default(new ObjectId("6824b479efd1eaef703746da")),
+  createdAt: Joi.date().timestamp("javascript").default(Date.now),
+  updatedAt: Joi.date().timestamp("javascript").default(null),
+});
+
 const validateBeforeCreateOrder = async (data) => {
   return await ORDER_SCHEMA.validateAsync(data, { abortEarly: false });
+};
+
+const validateBeforeCreateOrderForOnlinePayment = async (data) => {
+  return await ORDER_SCHEMA_FOR_ONLINE_PAYMENT.validateAsync(data, {
+    abortEarly: false,
+  });
 };
 
 const createNewOrder = async (data) => {
   try {
     const validateData = await validateBeforeCreateOrder(data);
+
+    return await GET_DB()
+      .collection(ORDER_COLLECTION_NAME)
+      .insertOne(validateData);
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+const createNewOrderForOnlinePayment = async (data) => {
+  try {
+    const validateData = await validateBeforeCreateOrderForOnlinePayment(data);
 
     return await GET_DB()
       .collection(ORDER_COLLECTION_NAME)
@@ -144,6 +186,21 @@ const getAllOrders = async () => {
   }
 };
 
+const getExpiredOrders = async () => {
+  try {
+    const result = await GET_DB()
+      .collection(ORDER_COLLECTION_NAME)
+      .find({
+        statusId: new ObjectId("6824b479efd1eaef703746da"),
+        createdAt: { $lt: Date.now() - 15 * 60 * 1000 },
+      })
+      .toArray();
+    return result;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 const getOrdersByUserId = async (userId) => {
   try {
     const result = await GET_DB()
@@ -231,9 +288,11 @@ const getOrderByOrderId = async (orderId) => {
 
 export const orderModel = {
   createNewOrder,
+  createNewOrderForOnlinePayment,
   getOneById,
   getAllOrders,
   getOrdersByUserId,
+  getExpiredOrders,
   updateOrderStatusById,
   deleteOrderById,
   getOrderByOrderId,

@@ -9,6 +9,11 @@ Router.route("/admin").get(
   orderController.getAllOrders
 );
 
+Router.route("/online-payment").post(
+  authMiddleware.isAuthorized,
+  orderController.createNewOrderForOnlinePayment
+);
+
 Router.route("/:orderId")
   .put(authMiddleware.isAuthorized, orderController.updateOrderStatusById)
   .delete(authMiddleware.isAuthorized, orderController.deleteOrderById);

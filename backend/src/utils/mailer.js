@@ -91,6 +91,63 @@ const getEmailContent = (statusId, orderId) => {
   };
 };
 
+export const informEmailForUser = async (userEmail, orderName, orderId) => {
+  const mailOptions = {
+    from: env.EMAIL_USER,
+    to: userEmail,
+    subject: "Thông báo đơn hàng",
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+        <p>Xin chào,</p>
+        <p>Đơn hàng: <strong>${orderName}</strong> của bạn đã được đặt thành công với mã đơn hàng: <strong>${orderId}</strong>.</p>
+        <p>Đơn hàng của bạn sẽ được xử lý trong thời gian ngắn nhất trong thời gian ngắn nhất</p>
+        <p>Cảm ơn bạn đã mua sắm với chúng tôi!</p>
+        <p>Trân trọng,<br>Admin</p>
+      </div>
+    `,
+  };
+  return await transporter.sendMail(mailOptions);
+};
+
+export const inFormEmailForAdmin = async (userName, orderName, orderId) => {
+  const mailOptions = {
+    from: env.EMAIL_USER,
+    to: env.EMAIL_USER,
+    subject: "Thông báo đơn hàng mới",
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+        <p>Xin chào Admin,</p>
+        <p>Đơn hàng: <strong>${orderName}</strong> của người dùng <strong>${userName}</strong> có mã đơn hàng: <strong>${orderId}</strong> đã được đặt thành công.</p>
+        <p>Vui lòng kiểm tra và xử lý đơn hàng này trong thời gian sớm nhất.</p>
+        <p>Trân trọng,<br>Admin</p>
+      </div>
+    `,
+  };
+  return await transporter.sendMail(mailOptions);
+};
+
+export const inFormEmailForUserAfterPaymentOnline = async (
+  userEmail,
+  orderName,
+  orderId
+) => {
+  const mailOptions = {
+    from: env.EMAIL_USER,
+    to: userEmail,
+    subject: "Thông báo đơn hàng đã thanh toán",
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+        <p>Xin chào,</p>
+        <p>Đơn hàng: <strong>${orderName}</strong> của bạn đã được thanh toán thành công với mã đơn hàng: <strong>${orderId}</strong>.</p>
+        <p>Đơn hàng của bạn sẽ được giao sớm nhất có thể</p>
+        <p>Cảm ơn bạn đã mua sắm với chúng tôi!</p>
+        <p>Trân trọng,<br>Admin</p>
+      </div>
+    `,
+  };
+  return await transporter.sendMail(mailOptions);
+};
+
 // Hàm gửi email thông báo trạng thái đơn hàng
 export const sendOrderStatusEmail = async (userEmail, orderId, statusId) => {
   try {

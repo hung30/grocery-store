@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 // import { Products } from "./data";
 import ReactPaginate from "react-paginate";
 import "./Product.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../../redux/authSlice";
 import { LoadingContext } from "../../contexts/LoadingContext";
@@ -28,7 +28,14 @@ export default function Product() {
   const { setIsLoading } = useContext(LoadingContext);
   const user = JSON.parse(localStorage.getItem("userInfo"));
   const timeoutIdRef = useRef(null);
+  const [searchParams] = useSearchParams();
 
+  useEffect(() => {
+    const messageParam = searchParams.get("message") || "";
+    if (messageParam === "fail") {
+      message.warning("Bạn đã huỷ đơn hàng!");
+    }
+  }, [searchParams]);
   useEffect(() => {
     const product = async () => {
       try {
@@ -140,11 +147,23 @@ export default function Product() {
       ).toString(),
     };
     try {
-      setIsLoading(true);
-      await authorizedAxiosInstance.post(`${env.API_URL}/v1/orders`, data);
-      message.success("Đặt hàng thành công!");
-      navigate("/order");
-      setIsLoading(false);
+      if (values.paymentMethod === "1") {
+        setIsLoading(true);
+        await authorizedAxiosInstance.post(`${env.API_URL}/v1/orders`, data);
+        message.success("Đặt hàng thành công!");
+        navigate("/order");
+        setIsLoading(false);
+      } else if (values.paymentMethod === "2") {
+        setIsLoading(true);
+        const res = await authorizedAxiosInstance.post(
+          `${env.API_URL}/v1/VNPay/create_payment_url`,
+          data
+        );
+        setIsLoading(false);
+        if (res.data.paymentUrl) {
+          window.location.href = res.data.paymentUrl;
+        }
+      }
     } catch (error) {
       setIsLoading(false);
       console.log(error);
